@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ЭХО-7 — текстовый хоррор-квест</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Literata:ital,wght@0,400;0,600;1,400&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0e11;--panel:#10161a;--line:#1d2a30;--text:#d5dcdf;--muted:#7b8a91;--acc:#7fe3d0;--hp:#e5594f;--san:#b79bff;--o2:#5ab6ff;--warn:#ffb454}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:"Literata",Georgia,"Times New Roman",serif;line-height:1.65}
+body{min-height:100vh;transition:background .6s}
+body.san6{background:#0b0d12}
+body.san3{background:#100a0f}
+.mono{font-family:"Share Tech Mono",ui-monospace,Menlo,Consolas,monospace}
+#menu{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:32px 20px;text-align:center}
+#menu h1{font-family:"Share Tech Mono",ui-monospace,monospace;font-size:clamp(44px,12vw,84px);letter-spacing:.28em;margin:0 0 0 .28em;color:var(--acc);text-shadow:0 0 28px rgba(127,227,208,.35)}
+#menu .tag{color:var(--muted);max-width:30em;margin:0 0 18px}
+#menu .sub{font-family:"Share Tech Mono",ui-monospace,monospace;color:var(--muted);font-size:13px;letter-spacing:.12em}
+.btn{font:inherit;font-family:"Share Tech Mono",ui-monospace,monospace;font-size:16px;letter-spacing:.08em;background:transparent;color:var(--acc);border:1px solid var(--acc);padding:13px 28px;min-width:240px;cursor:pointer;border-radius:3px;transition:.15s}
+.btn:hover{background:rgba(127,227,208,.1)}
+.btn.sec{color:var(--muted);border-color:var(--line)}
+#game{display:none;max-width:760px;margin:0 auto;padding:14px 16px 60px}
+.hud{position:sticky;top:0;z-index:5;background:linear-gradient(var(--bg) 85%,transparent);padding:8px 0 14px}
+.bars{display:grid;grid-template-columns:1fr 1fr;gap:10px 18px;font-family:"Share Tech Mono",ui-monospace,monospace;font-size:12px;color:var(--muted);letter-spacing:.1em}
+.bar .lab{display:flex;justify-content:space-between;margin-bottom:3px}
+.segs{display:flex;gap:3px}
+.segs i{flex:1;height:9px;background:#182227;border-radius:1px}
+.segs i.on.hp{background:var(--hp)}
+.segs i.on.san{background:var(--san)}
+.o2bar{height:9px;background:#182227;border-radius:1px;overflow:hidden}
+#o2fill{height:100%;background:var(--o2);transition:width .4s}
+#o2fill.low{background:var(--hp);animation:blink 1s infinite}
+@keyframes blink{50%{opacity:.4}}
+#clock{display:none;align-items:center;justify-content:space-between;color:var(--hp);border:1px solid var(--hp);padding:3px 10px;margin-top:10px;font-family:"Share Tech Mono",ui-monospace,monospace;font-size:13px;letter-spacing:.14em;animation:blink 1.2s infinite}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+#topline{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+#menubtn{background:none;border:0;color:var(--muted);font-family:"Share Tech Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.1em;cursor:pointer;padding:4px 0}
+#menubtn:hover{color:var(--acc)}
+#title{font-family:"Share Tech Mono",ui-monospace,monospace;font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:var(--acc);margin:18px 0 8px}
+#text p{margin:0 0 1em;font-size:18px;animation:fade .5s}
+#text p.whisper{color:var(--san);font-style:italic;opacity:.8}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.sysmsg{font-family:"Share Tech Mono",ui-monospace,monospace;font-size:13px;color:var(--warn);padding:2px 0}
+.narr{border-left:2px solid var(--line);padding:2px 0 2px 12px;margin:6px 0;color:#aab6bb;font-style:italic}
+#msgs{margin-bottom:10px}
+.choices{display:flex;flex-direction:column;gap:9px;margin-top:20px}
+.choice{display:flex;gap:12px;align-items:flex-start;text-align:left;font:inherit;font-size:16.5px;color:var(--text);background:var(--panel);border:1px solid var(--line);padding:12px 14px;cursor:pointer;border-radius:4px;line-height:1.45;transition:.15s}
+.choice:hover{border-color:var(--acc);background:#132026}
+.choice .num{font-family:"Share Tech Mono",ui-monospace,monospace;color:var(--acc);min-width:1.1em}
+.choice.whisperc{border-color:var(--san);color:#d9c9ff}
+.choice.primary{border-color:var(--acc);color:var(--acc)}
+.panel{margin-top:30px;border-top:1px solid var(--line);padding-top:14px;display:grid;gap:14px}
+.panel h3{font-family:"Share Tech Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.18em;color:var(--muted);margin:0 0 7px;font-weight:400}
+.chip{display:inline-block;font-size:13.5px;border:1px solid var(--line);padding:3px 9px;margin:0 6px 6px 0;border-radius:3px;background:var(--panel);color:var(--text)}
+button.chip.use{cursor:pointer;color:var(--acc);border-color:var(--acc);font-family:inherit}
+button.chip.use:hover{background:rgba(127,227,208,.12)}
+.note{font-size:14px;color:#aab6bb;margin-bottom:3px}
+.muted{color:var(--muted);font-size:14px}
+.endbox{margin-top:30px}
+.endinfo{text-align:center;margin-bottom:6px}
+.endtag{font-family:"Share Tech Mono",ui-monospace,monospace;letter-spacing:.3em;color:var(--muted);font-size:12px}
+.endcount{font-family:"Share Tech Mono",ui-monospace,monospace;font-size:13px;color:var(--acc);margin-top:4px}
+.kind-bad .endtag::after{content:" · ПРОВАЛ";color:var(--hp)}
+.kind-good .endtag::after{content:" · ВЫЖИЛ";color:var(--acc)}
+.kind-best .endtag::after{content:" · ЛУЧШИЙ ФИНАЛ";color:var(--warn)}
+.kind-neutral .endtag::after{content:" · ЦЕНА";color:var(--warn)}
+.kind-weird .endtag::after{content:" · ДРУГОЙ ФИНАЛ";color:var(--san)}
+@media (max-width:520px){#text p{font-size:17px}.choice{font-size:16px}}
+
+/* ================= ЭФФЕКТЫ И АНИМАЦИИ ================= */
+#wave{position:fixed;left:0;bottom:0;width:100%;height:200px;pointer-events:none;z-index:0}
+#menu,#game{position:relative;z-index:1}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:50;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,.14) 0,rgba(0,0,0,.14) 1px,transparent 1px,transparent 3px);opacity:.35;mix-blend-mode:multiply}
+#vig{position:fixed;inset:0;pointer-events:none;z-index:40;box-shadow:inset 0 0 140px 20px rgba(0,0,0,.65);transition:box-shadow .8s}
+body.lowhp #vig{animation:vigRed 1.6s ease-in-out infinite}
+body.lowsan #vig{animation:vigPurple 3s ease-in-out infinite}
+@keyframes vigRed{0%,100%{box-shadow:inset 0 0 140px 20px rgba(0,0,0,.65)}50%{box-shadow:inset 0 0 160px 40px rgba(229,89,79,.42)}}
+@keyframes vigPurple{0%,100%{box-shadow:inset 0 0 140px 20px rgba(0,0,0,.65)}50%{box-shadow:inset 0 0 170px 40px rgba(150,110,255,.34)}}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:45;opacity:0}
+#fx.dmg{animation:fxDmg .6s ease-out}
+#fx.fear{animation:fxFear .9s ease-out}
+#fx.heal{animation:fxHeal .8s ease-out}
+#fx.calm{animation:fxCalm .8s ease-out}
+#fx.air{animation:fxAir .8s ease-out}
+@keyframes fxDmg{0%{opacity:1;box-shadow:inset 0 0 200px 60px rgba(229,89,79,.75);background:rgba(229,89,79,.14)}100%{opacity:0}}
+@keyframes fxFear{0%{opacity:1;box-shadow:inset 0 0 200px 60px rgba(150,110,255,.7);background:rgba(150,110,255,.12)}40%{opacity:.7}100%{opacity:0}}
+@keyframes fxHeal{0%{opacity:1;box-shadow:inset 0 0 200px 50px rgba(110,230,150,.5)}100%{opacity:0}}
+@keyframes fxCalm{0%{opacity:1;box-shadow:inset 0 0 200px 50px rgba(183,155,255,.5)}100%{opacity:0}}
+@keyframes fxAir{0%{opacity:1;box-shadow:inset 0 0 200px 50px rgba(90,182,255,.5)}100%{opacity:0}}
+#game.shake{animation:shake .45s}
+@keyframes shake{0%,100%{transform:none}15%{transform:translate(-7px,2px)}30%{transform:translate(6px,-3px)}45%{transform:translate(-5px,3px)}60%{transform:translate(4px,-2px)}80%{transform:translate(-2px,1px)}}
+#game.glitchy #text,#game.glitchy #title{animation:glitchText .7s steps(2,end)}
+@keyframes glitchText{0%{transform:translateX(0);text-shadow:-2px 0 #ff4f7a,2px 0 #4fe0ff}20%{transform:translateX(-4px) skewX(3deg);text-shadow:3px 0 #ff4f7a,-3px 0 #4fe0ff}40%{transform:translateX(5px);clip-path:inset(20% 0 40% 0)}60%{transform:translateX(-2px);clip-path:none;text-shadow:-2px 0 #ff4f7a,2px 0 #4fe0ff}100%{transform:none;text-shadow:none}}
+
+/* — шкалы — */
+.bar{position:relative}
+.segs i{position:relative;overflow:hidden;transition:background .3s,transform .3s,opacity .3s}
+.segs i.on.hp{background:linear-gradient(90deg,#b8362e,#ff6a5c 45%,#b8362e);background-size:200% 100%;
+  animation:liquid 2.6s linear infinite,beat 1.4s ease-in-out infinite;animation-delay:calc(var(--i)*-.17s),calc(var(--i)*.07s);
+  box-shadow:0 0 8px rgba(229,89,79,.45)}
+.segs i.on.san{background:linear-gradient(90deg,#7a5ee0,#cdb8ff 45%,#7a5ee0);background-size:200% 100%;
+  animation:liquid 3.4s linear infinite,twinkle 2.2s ease-in-out infinite;animation-delay:calc(var(--i)*-.21s),calc(var(--i)*.15s);
+  box-shadow:0 0 8px rgba(160,125,255,.4)}
+.segs i.on::after{content:"";position:absolute;top:0;left:-60%;width:50%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-20deg);
+  animation:sweep 3.2s ease-in-out infinite;animation-delay:calc(var(--i)*.12s)}
+@keyframes liquid{to{background-position:200% 0}}
+@keyframes beat{0%,100%{transform:scaleY(1)}12%{transform:scaleY(1.55)}24%{transform:scaleY(1)}36%{transform:scaleY(1.3)}}
+@keyframes twinkle{0%,100%{opacity:1}50%{opacity:.62}}
+@keyframes sweep{0%,55%{left:-60%}100%{left:130%}}
+body.lowhp .segs i.on.hp{animation:liquid 1.4s linear infinite,beat .7s ease-in-out infinite;animation-delay:calc(var(--i)*-.17s),calc(var(--i)*.04s)}
+body.lowsan .segs i.on.san{animation:liquid 1.2s linear infinite,jitter .25s steps(2) infinite}
+@keyframes jitter{0%{transform:translate(0,0)}50%{transform:translate(1px,-1px)}100%{transform:translate(-1px,1px)}}
+.segs i.lost{animation:lost .6s ease-out}
+@keyframes lost{0%{background:#fff;transform:scale(1.5)}100%{transform:scale(1)}}
+.segs i.gain{animation:gain .7s ease-out}
+@keyframes gain{0%{transform:scale(1.8);filter:brightness(2.2)}100%{transform:scale(1)}}
+
+.o2bar{position:relative;height:11px;border-radius:6px;box-shadow:inset 0 0 0 1px #213038}
+#o2fill{position:relative;height:100%;border-radius:6px;overflow:hidden;transition:width .8s cubic-bezier(.3,.8,.3,1);
+  background:linear-gradient(180deg,#8fd3ff,#3a8fe0 60%,#2a6fb8);box-shadow:0 0 12px rgba(90,182,255,.5)}
+#o2fill::before{content:"";position:absolute;inset:0;
+  background:repeating-linear-gradient(115deg,rgba(255,255,255,.28) 0 8px,transparent 8px 22px);background-size:44px 100%;animation:flow 1.6s linear infinite}
+#o2fill::after{content:"";position:absolute;inset:0;
+  background:radial-gradient(circle at 20% 70%,rgba(255,255,255,.8) 0 1.5px,transparent 2px),radial-gradient(circle at 55% 40%,rgba(255,255,255,.7) 0 1.5px,transparent 2px),radial-gradient(circle at 85% 65%,rgba(255,255,255,.8) 0 1.5px,transparent 2px);
+  background-size:60px 100%;animation:bubbles 2.8s linear infinite}
+@keyframes flow{to{background-position:44px 0}}
+@keyframes bubbles{0%{background-position:0 14px;opacity:0}30%{opacity:1}100%{background-position:20px -14px;opacity:0}}
+#o2fill.low{background:linear-gradient(180deg,#ff9a90,#e5594f 60%,#a8352c);box-shadow:0 0 14px rgba(229,89,79,.7);animation:blink .8s infinite}
+
+.float{position:absolute;right:0;top:-4px;font-family:"Share Tech Mono",ui-monospace,monospace;font-size:15px;font-weight:700;pointer-events:none;animation:floatUp 1.3s ease-out forwards;text-shadow:0 0 10px currentColor}
+.float.neg{color:#ff7468}.float.pos{color:#7fe3d0}.float.fear{color:#cdb8ff}
+@keyframes floatUp{0%{opacity:0;transform:translateY(8px)}15%{opacity:1}100%{opacity:0;transform:translateY(-28px)}}
+.bar .lab b{font-weight:400;color:var(--text)}
+
+/* — текст и выборы — */
+#text p{animation:revealP .8s ease-out both}
+@keyframes revealP{0%{opacity:0;transform:translateY(8px);filter:blur(5px)}100%{opacity:1;transform:none;filter:none}}
+#title{position:relative;display:inline-block}
+#title::before{content:"";display:inline-block;width:7px;height:7px;background:var(--acc);margin-right:10px;box-shadow:0 0 10px var(--acc);animation:blink 1.4s infinite}
+.choice{animation:choiceIn .5s ease-out both;position:relative;overflow:hidden}
+@keyframes choiceIn{0%{opacity:0;transform:translateX(-14px)}100%{opacity:1;transform:none}}
+.choice::before{content:"";position:absolute;top:0;left:-70%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(127,227,208,.18),transparent);transform:skewX(-20deg);transition:left .5s}
+.choice:hover::before{left:130%}
+.choice:hover{transform:translateX(4px);box-shadow:0 0 18px rgba(127,227,208,.15)}
+.choice:active{transform:scale(.99)}
+.choice.whisperc{animation:choiceIn .5s ease-out both,whispGlow 2.4s ease-in-out infinite}
+@keyframes whispGlow{0%,100%{box-shadow:0 0 0 rgba(183,155,255,0)}50%{box-shadow:0 0 22px rgba(183,155,255,.5)}}
+.sysmsg{animation:slideIn .5s ease-out both}
+.narr{animation:slideIn .7s ease-out both}
+@keyframes slideIn{0%{opacity:0;transform:translateX(-12px)}100%{opacity:1;transform:none}}
+body.lowsan #text p{animation:revealP .8s ease-out both,flick 4s steps(1) infinite}
+@keyframes flick{0%,92%,100%{opacity:1}94%{opacity:.55}96%{opacity:1}98%{opacity:.7}}
+
+/* — инвентарь — */
+.chip{display:inline-flex;align-items:center;gap:7px;transition:.2s}
+.chip svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.chip:hover{border-color:var(--acc);box-shadow:0 0 14px rgba(127,227,208,.25);transform:translateY(-2px)}
+.chip.new{animation:chipPop .9s cubic-bezier(.2,1.4,.4,1)}
+@keyframes chipPop{0%{transform:scale(.3);opacity:0;box-shadow:0 0 0 rgba(127,227,208,0)}50%{transform:scale(1.2);box-shadow:0 0 28px rgba(127,227,208,.9);border-color:var(--acc)}100%{transform:scale(1)}}
+button.chip.use{animation:usePulse 2.2s ease-in-out infinite}
+@keyframes usePulse{0%,100%{box-shadow:0 0 0 rgba(127,227,208,0)}50%{box-shadow:0 0 14px rgba(127,227,208,.4)}}
+.note{animation:slideIn .6s ease-out both}
+.note.newn{color:var(--acc);animation:noteNew 1.6s ease-out}
+@keyframes noteNew{0%{background:rgba(127,227,208,.3)}100%{background:transparent}}
+
+/* — меню — */
+#menu h1{animation:hIn 1s ease-out .3s both,titleGlow 4s ease-in-out 1.3s infinite;position:relative}
+@keyframes hIn{0%{opacity:0;filter:blur(10px);transform:scale(1.08)}100%{opacity:1;filter:none;transform:none}}
+@keyframes titleGlow{0%,100%{text-shadow:0 0 22px rgba(127,227,208,.3)}50%{text-shadow:0 0 44px rgba(127,227,208,.7),0 0 90px rgba(127,227,208,.25)}}
+#menu h1::before,#menu h1::after{content:attr(data-t);position:absolute;left:0;right:0;top:0;opacity:0;pointer-events:none;text-shadow:none}
+#menu h1.gl::before{color:#ff4f7a;opacity:.85;transform:translateX(-6px);clip-path:inset(15% 0 55% 0)}
+#menu h1.gl::after{color:#4fe0ff;opacity:.85;transform:translateX(6px);clip-path:inset(55% 0 12% 0)}
+#menu>*:not(h1){animation:choiceIn .9s ease-out both}
+#menu>*:nth-child(1){animation-delay:.1s}#menu>*:nth-child(3){animation-delay:.6s}
+#menu>*:nth-child(4){animation-delay:.8s}#menu>*:nth-child(5){animation-delay:.95s}#menu>*:nth-child(6){animation-delay:1.1s}#menu>*:nth-child(7){animation-delay:1.2s}
+.btn{position:relative;overflow:hidden}
+.btn::before{content:"";position:absolute;top:0;left:-70%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(127,227,208,.3),transparent);transform:skewX(-20deg);transition:left .6s}
+.btn:hover::before{left:130%}
+.btn:hover{box-shadow:0 0 24px rgba(127,227,208,.3)}
+#clock{box-shadow:0 0 20px rgba(229,89,79,.35)}
+.endbox .endtag{animation:endIn 1.2s ease-out both}
+@keyframes endIn{0%{letter-spacing:1em;opacity:0}100%{letter-spacing:.3em;opacity:1}}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-delay:0s!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+  #text p,.choice,#menu>*{opacity:1!important;filter:none!important}
+}
+#title.tin{animation:titleIn .7s ease-out}
+@keyframes titleIn{0%{opacity:0;letter-spacing:.6em;filter:blur(4px)}100%{opacity:1;letter-spacing:.2em;filter:none}}
+</style>
+</head>
+<body>
+<canvas id="wave"></canvas>
+<div id="vig"></div>
+<div id="fx"></div>
+<div id="menu">
+  <div class="sub">ТЕКСТОВЫЙ КВЕСТ · ХОРРОР · ВЫЖИВАНИЕ</div>
+  <h1 data-t="ЭХО-7">ЭХО-7</h1>
+  <p class="tag">Станция молчит одиннадцать суток. Ты проснулся не по расписанию. Они реагируют на звук, так что не шуми.</p>
+  <button class="btn" id="newbtn">НОВАЯ ИГРА</button>
+  <button class="btn" id="contbtn" style="display:none">ПРОДОЛЖИТЬ</button>
+  <div class="sub" id="endsline"></div>
+  <div class="sub">Выбирай кнопками или цифрами 1–9</div>
+</div>
+<div id="game">
+  <div class="hud">
+    <div id="topline"><span class="sub mono" style="font-size:12px;color:var(--muted);letter-spacing:.14em">ЭХО-7</span><button id="menubtn">МЕНЮ</button></div>
+    <div class="bars">
+      <div class="bar" id="bar-hp"><div class="lab"><span>ЗДОРОВЬЕ</span><b id="hpv"></b></div><div class="segs" id="hp"></div></div>
+      <div class="bar" id="bar-san"><div class="lab"><span>РАССУДОК</span><b id="sanv"></b></div><div class="segs" id="san"></div></div>
+      <div class="bar" id="bar-o2" style="grid-column:1/3"><div class="lab"><span>КИСЛОРОД</span><b id="o2val"></b></div><div class="o2bar"><div id="o2fill"></div></div></div>
+    </div>
+    <div id="clock"><span>ПЕРЕГРУЗКА РЕАКТОРА</span><span>осталось шагов: <b id="clockval"></b></span></div>
+  </div>
+  <div id="title"></div>
+  <div id="msgs"></div>
+  <div id="text"></div>
+  <div class="choices" id="choices"></div>
+  <div class="panel">
+    <div><h3>ИНВЕНТАРЬ</h3><div id="inv"></div></div>
+    <div><h3>ЗАМЕТКИ</h3><div id="notes"></div></div>
+  </div>
+</div>
+<script>
+'use strict';
+/* ЭХО-7 — данные игры (часть 1: предметы, помощники, начало, коридор) */
+const ITEMS = {
+  lamp:'Налобный фонарь', crowbar:'Ломик', med:'Аптечка', sedative:'Седатив', serum:'Сыворотка V-7',
+  card1:'Карта доступа (ур. 1)', card2:'Карта капитана (ур. 2)', fuse:'Предохранитель питания',
+  radio:'Рация Давида', nav:'Навигационный кристалл', cutter:'Плазменный резак'
+};
+const ITEM_DESC = {
+  lamp:'Светит. Без него в тёмных местах страшнее.', crowbar:'Тяжёлый, шумный.',
+  med:'Применить: +4 к здоровью.', sedative:'Применить: +3 к рассудку.', serum:'Применить: стереть то, что ты услышал, и +3 к рассудку.',
+  card1:'Открывает лабораторный лифт, реактор, инструментальную клетку.', card2:'Открывает мостик и каюту капитана.',
+  fuse:'Нужен ангарной двери.', radio:'Шумит. Можно использовать как приманку.', nav:'Без него шаттл не полетит.',
+  cutter:'Режет почти всё. Даже лёд, который не лёд.'
+};
+const STACK = new Set(['med','sedative','serum']);
+const CODE = { a:'41', b:'07', c:'93' };
+
+function has(s,i){ return s.inv.includes(i); }
+function sys(s,t){ s.msgs.push({k:'sys',t:t}); }
+function give(s,i){ if(STACK.has(i) || !has(s,i)){ s.inv.push(i); sys(s,'Получено: '+ITEMS[i]); } }
+function take(s,i){ const k=s.inv.indexOf(i); if(k>=0) s.inv.splice(k,1); }
+function hurt(s,n){ s.hp=Math.max(0,s.hp-n); sys(s,'Здоровье −'+n); }
+function heal(s,n){ s.hp=Math.min(10,s.hp+n); sys(s,'Здоровье +'+n); }
+function fear(s,n){ s.san=Math.max(0,s.san-n); sys(s,'Рассудок −'+n); }
+function calm(s,n){ s.san=Math.min(10,s.san+n); sys(s,'Рассудок +'+n); }
+function air(s,n){ s.o2=Math.min(100,s.o2+n); sys(s,'Кислород +'+n+'%'); }
+function loud(s,n){ s.noise+=(n||1); }
+function flag(s,k){ s.f[k]=true; }
+function codesKnown(s){ return s.f.code_a && s.f.code_b && s.f.code_c; }
+
+const S = {};
+
+S.start = { t:'Пробуждение', safe:true,
+  text:`Крышка капсулы уходит вверх с хрустом, будто лопается лёд.
+
+Ты не помнишь, как засыпал. Помнишь только расписание: подъём через четыре месяца, по плану, с кофе и приветствием капитана. Вместо этого — красный свет, холод и тишина. Слишком плотная: как вата в ушах.
+
+— Лев Савин, — произносит ровный женский голос из потолка. — Это МАРТА, бортовой интеллект станции «Эхо-7». Я рада, что вы живы. Прошу вас не повышать голос.`,
+  ch:[{ t:'Сесть и осмотреться', go:'bay' }] };
+
+S.bay = { t:'Криоотсек', safe:true,
+  text:s=>`Шесть капсул. Пять пусты, крышки отброшены изнутри, на стенках — вмятины от ударов. Шестая — твоя. Экипаж проснулся по расписанию. Ты — нет.
+
+Дверь в коридор заперта вручную: рычаг с красной маркировкой. На стене — шкафчик медслужбы и ящик с инструментами. Динамик МАРТЫ мигает под потолком.${s.f.bay_air?'':'\n\nУ стены — панель кислородного питания криоотсека.'}`,
+  ch:[
+    { t:'Открыть шкафчик медслужбы', if:s=>!s.f.locker, fx:s=>{ flag(s,'locker'); give(s,'lamp'); give(s,'med'); }, go:null },
+    { t:'Взять ломик из ящика с инструментами', if:s=>!s.f.toolbox, fx:s=>{ flag(s,'toolbox'); give(s,'crowbar'); } },
+    { t:'Подключить скафандр к кислородной панели', if:s=>!s.f.bay_air, fx:s=>{ flag(s,'bay_air'); air(s,30); } },
+    { t:'Поговорить с МАРТОЙ', go:'marta' },
+    { t:s=>has(s,'lamp')?'Открыть дверь и выйти в коридор':'Выйти в коридор без света (страшно)',
+      fx:s=>{ if(!has(s,'lamp')) fear(s,2); }, go:s=>s.f.sing1?'corr':'sing1' }
+  ] };
+
+S.marta = { t:'МАРТА', safe:true,
+  text:`— Одиннадцать суток назад экипаж перестал отвечать на вызовы, — говорит МАРТА. — Жизнеобеспечение в норме, но датчики жилого кольца и лабораторий вышли из строя. Я слышу станцию только… фрагментами. Зато слышу вот что.
+
+Из динамиков на секунду вырывается низкий, чистый звук — будто кто-то ведёт мокрым пальцем по краю бокала. Голос МАРТЫ срывается и возвращается:
+
+— Прошу прощения. Помехи. Основное, Лев: не шумите. Они реагируют на звук.`,
+  ch:[
+    { t:'«Кто такие „они“?»', go:'marta2' },
+    { t:'«Как мне выбраться отсюда?»', go:'marta3' },
+    { t:'Вернуться', go:'bay' }
+  ] };
+
+S.marta2 = { t:'МАРТА', safe:true,
+  text:`— Экипаж, — коротко отвечает МАРТА. — Или то, что от него осталось. Доктор Вахрушева назвала это Хором. Её записи — в жилом кольце, в каюте. Я не могу подтвердить их достоверность. Я могу лишь подтвердить, что они поют, и что пение распространяется.
+
+Пауза.
+
+— Образец L-9 подняли из ледяного керна на третьи сутки после прибытия. Лабораторное кольцо на карантине, но карантин, как выяснилось, слушает не всех.`,
+  ch:[ { t:'Назад', go:'marta' } ] };
+
+S.marta3 = { t:'МАРТА', safe:true,
+  text:`— Протокол допускает три варианта, — говорит МАРТА, и ты слышишь в её голосе что-то вроде усталости. — Первый: шаттл «Ласточка» в ангаре. Ему нужны предохранитель питания из машинного отделения и навигационный кристалл с мостика. Второй: сигнал бедствия с мостика. Антенна повреждена, чинить придётся снаружи, через шлюз машинного.
+
+Третий вариант: перегрузка реактора. Код из трёх частей: у доктора, у капитана и в журнале вахты на мостике. Третий вариант — рекомендация номер ноль. Вы её не слышали.
+
+— И есть четвёртый, — добавляет она тише. — Но я его не называла.`,
+  ch:[ { t:'Назад', go:'marta' } ] };
+
+S.sing1 = { t:'Поющий в коридоре',
+  text:`Коридор круто изгибается вдоль кольца станции. В тридцати метрах, у пятна аварийного света, стоит человек в комбинезоне инженера. Давид, судя по нашивке. Он стоит лицом к стене и тихо-тихо тянет одну ноту. Не мелодию. Ноту.
+
+Чем дольше слушаешь, тем сильнее хочется подпеть.`,
+  ch:[
+    { t:'Замереть и тихо пройти мимо вдоль стены', fx:s=>{ flag(s,'sing1'); fear(s,1); }, go:'corr',
+      note:'Ты идёшь, не дыша. Каждый шаг — как по тонкому льду. Давид не оборачивается.' },
+    { t:'Ударить его ломиком', if:s=>has(s,'crowbar'), fx:s=>{ flag(s,'sing1'); flag(s,'david_dead'); hurt(s,1); loud(s,1); give(s,'radio'); }, go:'corr',
+      note:'Удар. Ещё. Он даже не пытается защищаться — просто перестаёт петь. Тишина после этого звука оглушает. В кармане его комбинезона — портативная рация, ещё тёплая.' },
+    { t:'Броситься на него голыми руками', if:s=>!has(s,'crowbar'), fx:s=>{ flag(s,'sing1'); flag(s,'david_dead'); hurt(s,4); loud(s,1); give(s,'radio'); }, go:'corr',
+      note:'Он тяжелее, чем выглядит, и руки у него сильные. Но драка кончается быстро, и после неё очень тихо. В кармане — рация.' },
+    { t:'Отступить в криоотсек', go:'bay' }
+  ] };
+
+S.corr = { t:'Центральное кольцо',
+  enter:s=>{ if(s.noise>=3 && !s.f.sing2) return 'sing2'; },
+  text:s=>`Центральное кольцо станции: серые панели, красные полосы аварийных ламп. ${s.f.david_dead?'Тело Давида лежит у стены, там, где ты его оставил.':'Давид по-прежнему стоит у стены и поёт. Ты прошёл мимо — и он не заметил.'}
+
+Налево — жилое кольцо, направо — камбуз и кают-компания. Дальше по кольцу: лифт в лабораторный сектор, массивная дверь машинного отделения, ангар и мостик.`,
+  ch:[
+    { t:'Жилое кольцо', go:'living' },
+    { t:'Кают-компания и камбуз', go:'mess' },
+    { t:'Машинное отделение', go:'eng' },
+    { t:'Лифт в лабораторный сектор', go:'lab_lift' },
+    { t:'Мостик', go:'bridge_door' },
+    { t:'Ангар', go:'hangar_door' },
+    { t:'Вернуться в криоотсек', go:'bay' }
+  ] };
+
+S.sing2 = { t:'Они услышали',
+  text:`Шум не прошёл бесследно. С обоих концов коридора — шаги. Ровные, неторопливые, в такт ноте, которую ты теперь слышишь отовсюду. Двое. Они не бегут. Им некуда спешить.`,
+  ch:[
+    { t:'Рвануть в криоотсек и запереть рычаг', go:'bay', fx:s=>{ flag(s,'sing2'); s.noise=0; fear(s,2); },
+      note:'Ты влетаешь в отсек и всем весом налегаешь на рычаг. Они бьются в дверь, потом перестают. Поют. Долго. Потом уходят.' },
+    { t:'Включить рацию Давида на полную и бросить подальше', if:s=>has(s,'radio'), fx:s=>{ flag(s,'sing2'); s.noise=0; take(s,'radio'); }, go:'corr',
+      note:'Рация орёт треском эфира. Они разворачиваются на звук, как подсолнухи на свет. Ты проскальзываешь мимо.' },
+    { t:'Драться', fx:s=>{ flag(s,'sing2'); s.noise=0; hurt(s,5); fear(s,1); }, go:'corr',
+      note:'Это длится дольше, чем ты думал. Потом остаётся только твоё тяжёлое дыхание и тишина.' }
+  ] };
+/* ЭХО-7 — данные игры (часть 2: жилое кольцо, камбуз, машинное, внешний выход) */
+
+S.living = { t:'Жилое кольцо',
+  text:`Узкий коридор с каютами по обе стороны. Таблички: «Вахрушева», «Давидов», «Орлова». В воздухе — запах остывшего кофе и чего-то сладкого, как прелое яблоко.
+
+Из-за одной из дверей слышен шёпот.`,
+  ch:[
+    { t:'Каюта Давидова', go:'cab_david' },
+    { t:'Каюта Вахрушевой (оттуда шёпот)', go:'cab_irina' },
+    { t:'Каюта капитана Орловой', go:'cab_cap_door' },
+    { t:'Назад в центральное кольцо', go:'corr' }
+  ] };
+
+S.cab_david = { t:'Каюта инженера',
+  text:s=>`Каюта инженера аккуратнее, чем следовало ожидать. На столе — блокнот. Последняя запись датирована одиннадцатым днём, почерк плывёт:
+
+«Они не поют — они ИЗЛУЧАЮТ. Частоту слышишь костями. Если станцию заглушить мощным звуком — они замолкают, пока шум длится. Рация… реактор… Код разбит на три части, у доктора, у капитана и на мостике. Если что — я оставил всё нужное в ящике стола».`,
+  ch:[
+    { t:'Открыть ящик стола', if:s=>!s.f.david_box, fx:s=>{ flag(s,'david_box'); give(s,'card1'); give(s,'sedative'); } },
+    { t:'Назад', go:'living' }
+  ] };
+
+S.cab_irina = { t:'Каюта доктора',
+  enter:s=>{ if(s.f.irina_done) return 'cab_irina_after'; },
+  text:`Дверь приоткрыта. В каюте темно, горит только лабораторная лампа. Доктор Вахрушева сидит на койке, ссутулившись, и смотрит в пол. Она не поёт. Она шепчет цифры.
+
+Когда ты входишь, она поднимает голову. Глаза у неё ясные, человеческие.
+
+— Лев? — голос хриплый. — Ты ведь не слышал его? Скажи, что не слышал.`,
+  ch:[
+    { t:'«Нет. Я спал в капсуле»', go:'irina_talk' },
+    { t:'«Что ты шепчешь?» (слушать до конца)', go:'irina_listen' },
+    { t:'Ударить её ломиком', if:s=>has(s,'crowbar'), go:'irina_kill' },
+    { t:'Тихо выйти', go:'living' }
+  ] };
+
+S.irina_talk = { t:'Каюта доктора',
+  text:`Она выдыхает, будто держала воздух все эти дни.
+
+— Тогда слушай. Пока тихо, я человек. Когда поёт — отдаюсь им на третьей ноте. Это я пишу себе в блокнот, чтобы помнить. Лёд — не лёд, Лев. Это что-то вроде нервной ткани, замёрзшей в породе до начала нашей эры. Она хочет только одного — чтобы её слушали.
+
+Вахрушева протягивает листок:
+
+— Моя часть кода реактора: сорок один. Остальное у капитана и в журнале вахты. И… в лабораторном холодильнике сыворотка V-7. Она не проверена на людях. Принимай до, а не после.
+
+Она отворачивается к стене.
+
+— Уходи, пока я ещё помню своё имя.`,
+  ch:[ { t:'Уйти', fx:s=>{ flag(s,'irina_done'); flag(s,'irina_alive'); flag(s,'code_a'); flag(s,'serum_hint'); sys(s,'Код реактора: часть А записана'); }, go:'living' } ] };
+
+S.irina_listen = { t:'Каюта доктора',
+  text:`Ты подходишь ближе и слушаешь. Сначала — цифры. Потом слова между цифрами. Потом то, что лежит под словами: ровный тон, очень чистый, очень ласковый.
+
+Ты слышишь, что хочет лёд. Он не хочет убивать. Он просто устал быть один.
+
+Рука доктора стискивает твою:
+
+— Лев, не слушай до конца!
+
+Но ты уже услышал достаточно. Код А — сорок один — записан у тебя в голове, как и ещё кое-что: «нагреть керн до температуры плазмы». Эта мысль не твоя.`,
+  ch:[ { t:'Вырваться и выйти', fx:s=>{ flag(s,'irina_done'); flag(s,'irina_alive'); flag(s,'code_a'); flag(s,'heard'); flag(s,'hint_cutter'); fear(s,3); sys(s,'Код реактора: часть А записана'); sys(s,'Ты слышал Хор: шаттл с тобой на борту рискует стать носителем'); }, go:'living' } ] };
+
+S.irina_kill = { t:'Каюта доктора',
+  text:`Ты бьёшь быстро, пока она ещё в себе. Она не сопротивляется. Только успевает сказать:
+
+— Спасибо.
+
+На койке остаётся блокнот. В нём — «41» обведено дважды. Ничего больше.`,
+  ch:[ { t:'Забрать блокнот и выйти', fx:s=>{ flag(s,'irina_done'); flag(s,'code_a'); flag(s,'hint_cutter'); fear(s,2); hurt(s,1); loud(s,1); sys(s,'Код реактора: часть А записана'); }, go:'living' } ] };
+
+S.cab_irina_after = { t:'Каюта доктора',
+  text:s=>s.f.irina_alive
+    ? `Вахрушева лежит лицом к стене и больше не поворачивается. Ты слышишь её шёпот: цифры. Ты решаешь не мешать.`
+    : `Каюта пуста и тиха. На койке — прикрытое одеялом тело.`,
+  ch:[ { t:'Выйти', go:'living' } ] };
+
+S.cab_cap_door = { t:'Каюта капитана',
+  text:`Дверь каюты Орловой — с красной маркировкой второго уровня. Электронный замок мигает отказом.`,
+  ch:[
+    { t:'Подцепить дверь ломиком (шумно)', if:s=>has(s,'crowbar') && !s.f.cap_open, fx:s=>{ flag(s,'cap_open'); loud(s,1); }, go:'cab_captain',
+      note:'Металл визжит. Ты взмокаешь, пока замок сдаётся. Где-то по кольцу слышно, как нота на секунду сбивается.' },
+    { t:'Войти (дверь взломана)', if:s=>s.f.cap_open, go:'cab_captain' },
+    { t:'Назад', go:'living' }
+  ] };
+
+S.cab_captain = { t:'Каюта капитана',
+  text:s=>`Капитан Орлова сидит у стола с пустым шприцем в руке. Ушла тихо и осознанно: на столе записка, красная ключ-карта и распечатанный лист с кодом.
+
+«Если это читает спасатель. Образец L-9 нельзя поднимать на борт ни одного корабля. Нельзя. Он зовёт. Либо уничтожить его, либо не оставлять следов станции. Моя часть кода реактора — ноль семь. Я приказала МАРТЕ запечатать лабораторное кольцо. Она не смогла: звук идёт по вентиляции».
+
+Подпись — аккуратная, ровная. Рука не дрожала.`,
+  ch:[
+    { t:'Забрать карту и записать код', if:s=>!s.f.cap_taken, fx:s=>{ flag(s,'cap_taken'); flag(s,'code_b'); give(s,'card2'); sys(s,'Код реактора: часть Б записана'); fear(s,1); } },
+    { t:'Выйти', go:'living' }
+  ] };
+
+S.mess = { t:'Кают-компания',
+  text:`Стол накрыт на шестерых. Еда засохла, кофе покрылся плёнкой. На одном из стульев спиной к тебе сидит человек в белой куртке: повар Гоша. Он покачивается и напевает в такт вентилятору под потолком.
+
+На кухне видны шкафы, холодильник и стальной шкафчик аварийного запаса.`,
+  ch:[
+    { t:'Обыскать кухню, не приближаясь к повару', if:s=>!s.f.mess_search, fx:s=>{ flag(s,'mess_search'); air(s,40); give(s,'med'); fear(s,1); } },
+    { t:'Подойти к повару', go:'gosha' },
+    { t:'Уйти', go:'corr' }
+  ] };
+
+S.gosha = { t:'Повар',
+  text:`Ты обходишь стол. Гоша не оборачивается. Его губы почти не двигаются, звук идёт откуда-то глубже, чем горло.
+
+Ты наклоняешься и различаешь между нотами слова. Он повторяет одно и то же, как молитву: «Если нагреть — замолчит. Если нагреть — замолчит. Если нагреть — замолчит».`,
+  ch:[ { t:'Отойти', fx:s=>{ flag(s,'hint_cutter'); fear(s,1); }, go:'mess' } ] };
+
+S.eng = { t:'Машинное отделение',
+  text:`Низкий, честный гул реактора — механический, настоящий. Единственный звук на станции, который не пугает. Вдоль стены — стеллаж с запчастями, у переборки — инструментальная клетка с электронным замком.
+
+Справа — дверь в реакторный зал. Слева — переходной шлюз к внешнему люку.`,
+  ch:[
+    { t:'Взять предохранитель питания со стеллажа', if:s=>!has(s,'fuse') && !s.f.fuse_in, fx:s=>{ give(s,'fuse'); } },
+    { t:'Открыть инструментальную клетку картой', if:s=>has(s,'card1') && !s.f.cutter_taken, fx:s=>{ flag(s,'cutter_taken'); give(s,'cutter'); } },
+    { t:'Подключиться к резервному воздуху', if:s=>!s.f.eng_air, fx:s=>{ flag(s,'eng_air'); air(s,30); } },
+    { t:'Реакторный зал', go:'reactor' },
+    { t:'Шлюз', go:'airlock' },
+    { t:'Назад в центральное кольцо', go:'corr' }
+  ] };
+
+S.reactor = { t:'Реакторный зал',
+  text:s=>{
+    const a = s.f.code_a ? CODE.a : '??', b = s.f.code_b ? CODE.b : '??', c = s.f.code_c ? CODE.c : '??';
+    return `Реактор светится синим сквозь защитное стекло. На пульте — панель аварийной перегрузки: три окна кода.
+
+${a} · ${b} · ${c}
+
+${has(s,'card1') ? 'Карта первого уровня открыла дверь, но вот стоит ли открывать то, что за ней…' : ''}`;
+  },
+  ch:[
+    { t:'Ввести код и запустить перегрузку', if:s=>codesKnown(s) && !s.f.overload, fx:s=>{ flag(s,'overload'); s.clock=9; }, go:'reactor_set' },
+    { t:'Попробовать подобрать недостающие цифры', if:s=>!codesKnown(s), fx:s=>{ hurt(s,2); loud(s,2); }, note:'Панель бьёт искрами. Станция чуть слышно вздрагивает.' },
+    { t:'Назад', go:'eng' }
+  ] };
+S.reactor.enter = s => { if(!has(s,'card1')) return 'reactor_locked'; };
+
+S.reactor_locked = { t:'Реакторный зал',
+  text:`Дверь реакторного зала требует карту первого уровня.`,
+  ch:[ { t:'Назад', go:'eng' } ] };
+
+S.reactor_set = { t:'Перегрузка',
+  text:`Табло: 00:09:00. Реактор набирает тон — густой, звенящий. Второй звук на станции, а может быть первый.
+
+Поющие в коридорах замолкают один за другим. Станция звучит громче них.
+
+Девять минут. Или девять шагов, смотря на что ты рассчитываешь.`,
+  ch:[
+    { t:'Остаться и держать контур вручную', go:'end_sacrifice' },
+    { t:'Бежать к шаттлу', go:'eng' }
+  ] };
+
+S.airlock = { t:'Шлюз',
+  text:`Малый шлюз. На стенах — крепления для скафандров; твой лёгкий скафандр держится, хоть и скрипит. Наружный люк подёрнут инеем.`,
+  ch:[
+    { t:'Выйти на внешнюю обшивку (расход кислорода выше)', if:s=>s.o2>=35, go:'ext' },
+    { t:'Выйти на внешнюю обшивку (кислорода мало — опасно)', if:s=>s.o2<35, go:'ext' },
+    { t:'Назад в машинное', go:'eng' }
+  ] };
+
+S.ext = { t:'Внешняя обшивка', cost:6,
+  text:`Мирра заполняет полнеба — молочно-голубая, в трещинах тёмных каньонов. Станция тянется вдоль, как позвоночник. Антенный блок мостика — в двадцати метрах, на выносной штанге.
+
+Ничто не движется. И всё же в наушниках скафандра слышна нота. Даже здесь. Даже по радиоканалу.`,
+  ch:[
+    { t:'Идти вдоль штанги к антенне', go:'antenna' },
+    { t:'Вернуться в шлюз', go:'airlock' }
+  ] };
+
+S.antenna = { t:'Антенный блок', cost:5,
+  text:s=>`Блок повреждён: разъём вырван с мясом, рядом — тёмное пятно, застывшее каплями вдоль штанги. Здесь кто-то был. Тимур, связист, пытался починить — или отключить.
+
+${s.f.antenna_ok ? 'Разъём на месте. Лампа «несущая» горит ровным зелёным.' : 'Тарелка смотрит в никуда.'}`,
+  ch:[
+    { t:'Вставить разъём и выровнять тарелку', if:s=>!s.f.antenna_ok, fx:s=>{ flag(s,'antenna_ok'); sys(s,'Антенна восстановлена'); } },
+    { t:'Прислушаться к ноте в наушниках', if:s=>!s.f.lore_ice, fx:s=>{ flag(s,'lore_ice'); fear(s,2); }, note:'Нота идёт не со станции. Она идёт из-под ног, из-под льда Мирры. Там их ещё много.' },
+    { t:'Вернуться к шлюзу', go:'ext' }
+  ] };
+/* ЭХО-7 — данные игры (часть 3: мостик, лаборатория, ангар, концовки) */
+
+S.bridge_door = { t:'Дверь мостика',
+  text:`Дверь на мостик закрыта красным замком второго уровня. В вентиляционной решётке рядом — пустота, достаточно широкая, чтобы протиснуться.`,
+  ch:[
+    { t:'Приложить карту капитана', if:s=>has(s,'card2'), go:'bridge' },
+    { t:'Пролезть через вентиляцию', if:s=>has(s,'crowbar'), go:'vent' },
+    { t:'Назад', go:'corr' }
+  ] };
+
+S.vent = { t:'Вентиляционная шахта', cost:5,
+  text:`Узкая шахта пахнет сладко-тухлым. Ты ползёшь на животе, дыша носом, а по трубам идёт мягкая вибрация, будто вся станция — один орган.
+
+На решётке впереди лежит рука. Пальцы шевелятся в такт.`,
+  ch:[
+    { t:'Проползти мимо', fx:s=>{ fear(s,2); }, go:'bridge' },
+    { t:'Отползти назад', go:'bridge_door' }
+  ] };
+
+S.bridge = { t:'Мостик',
+  text:s=>`Круглый зал с панорамным окном. За стеклом — Мирра. Консоли светятся аварийно. В кресле связиста сидит Тимур спиной к тебе, в наушниках. Он не поёт. Он слушает.
+
+На консоли штурмана в гнезде торчит навигационный кристалл. В журнале связи открыто последнее окно с кодом вахты.${s.f.antenna_ok ? '\n\nИндикатор несущей горит зелёным: связь есть.' : '\n\nИндикатор несущей мёртв: антенна не отвечает.'}`,
+  ch:[
+    { t:'Вынуть навигационный кристалл', if:s=>!has(s,'nav') && !s.f.nav_used, fx:s=>{ give(s,'nav'); } },
+    { t:'Записать код из журнала вахты', if:s=>!s.f.code_c, fx:s=>{ flag(s,'code_c'); sys(s,'Код реактора: часть В записана'); } },
+    { t:'Отправить сигнал бедствия', if:s=>s.f.antenna_ok, go:'broadcast' },
+    { t:'Попробовать связаться (антенна не отвечает)', if:s=>!s.f.antenna_ok, note:'Эфир молчит. Лампа «нет несущей». Антенну нужно чинить снаружи, через шлюз машинного.' },
+    { t:'Подойти к Тимуру', go:'timur' },
+    { t:'Выйти на кольцо', go:'corr' }
+  ] };
+
+S.timur = { t:'Связист',
+  text:`Он не оборачивается.
+
+— Я слышу их, Лев, — говорит он обычным усталым голосом. — Не ноты — слова. Они говорят из льда. Они не злые. Они просто… одни. Очень давно одни.
+
+Пауза. Тимур наконец поворачивается: глаза закрыты, на лице — спокойствие.
+
+— Если хочешь заставить их замолчать, надо прогреть керн. Плазмой. Резак в машинном. Но они тогда умрут. Все, кто поёт. Вся станция.`,
+  ch:[
+    { t:'Снять с него наушники', fx:s=>{ hurt(s,3); loud(s,2); flag(s,'hint_cutter'); }, go:'bridge',
+      note:'Он вскрикивает так, словно с него содрали кожу. Взмахивает рукой, попадает тебе по лицу — и обмякает в кресле.' },
+    { t:'Оставить его в покое', fx:s=>{ flag(s,'hint_cutter'); }, go:'bridge' }
+  ] };
+
+S.broadcast = { t:'Передача',
+  text:s=>`Ты вводишь координаты, сводку, полный журнал Орловой. Индикатор несущей мигает: передача пошла. «Сигнал ушёл», — подтверждает МАРТА.
+
+В тот же миг на всех каналах станции вступает хор. Громче, ближе. Двери в коридоре начинают открываться одна за другой.
+
+Тимур снимает наушники.
+
+— Спасибо, — говорит он. — Они тоже услышали.`,
+  ch:[ { t:'Держать дверь мостика до конца', go:s=> s.hp>=5 ? 'end_signal_ok' : 'end_signal_cost' } ] };
+
+S.lab_lift = { t:'Лифт',
+  text:`Грузовой лифт в лабораторный сектор. Панель с красным светодиодом. Карта первого уровня.`,
+  ch:[
+    { t:'Приложить карту', if:s=>has(s,'card1'), go:'lab_hall' },
+    { t:'Карты нет', if:s=>!has(s,'card1'), note:'Светодиод мигает отказом. Нужна карта первого уровня.' },
+    { t:'Назад', go:'corr' }
+  ] };
+
+S.lab_hall = { t:'Лабораторный зал',
+  text:s=>`Свет здесь белый, холодный, чистый — такой бывает только в больницах и в сказках. Двое сотрудников в лабораторных халатах стоят друг напротив друга и поют терцией, глаза закрыты. Между ними и дальней дверью — коридор шириной в метр.${s.f.lab_clear ? '\n\nПроход свободен.' : ''}`,
+  ch:[
+    { t:'Включить рацию на дальнем столе и пройти, пока они идут к звуку', if:s=>has(s,'radio') && !s.f.lab_clear, fx:s=>{ flag(s,'lab_clear'); take(s,'radio'); }, note:'Рация плюётся статикой. Они поворачиваются, как подсолнухи на свет. Ты проходишь по стеночке.' },
+    { t:'Идти вдоль стены, не дыша', if:s=>!s.f.lab_clear, fx:s=>{ flag(s,'lab_clear'); hurt(s,2); fear(s,1); }, note:'Один открывает глаза. Ты не успеваешь отвернуться. Удар, боль и тишина. Ты проскакиваешь.' },
+    { t:'Пройти дальше, в холодильную', if:s=>s.f.lab_clear, go:'lab_fridge' },
+    { t:'Пройти дальше, к керну', if:s=>s.f.lab_clear, go:'lab_core' },
+    { t:'Вернуться в лифт', go:'lab_lift' }
+  ] };
+
+S.lab_fridge = { t:'Холодильная',
+  text:`Стеллаж с биообразцами. Одна из ампул подписана «V-7 / сыворотка». Рядом записка Вахрушевой: «Не проверено на людях. Вводить до, а не после».`,
+  ch:[
+    { t:'Взять ампулу', if:s=>!s.f.serum_taken, fx:s=>{ flag(s,'serum_taken'); give(s,'serum'); } },
+    { t:'Назад', go:'lab_hall' }
+  ] };
+
+S.lab_core = { t:'Керн',
+  text:`В центре зала — прозрачный цилиндр. В нём — кусок льда, ничего особенного, пока не смотришь на него долго. Он не лёд. Внутри — нити, тонкие, как нервы, мигающие с частотой, которую ты уже слышишь как ноту.
+
+Хор поёт здесь тише всего. Почти шёпотом.`,
+  ch:[
+    { t:'Прислушаться к керну', go:'lab_listen' },
+    { t:'Прогреть керн плазменным резаком', if:s=>has(s,'cutter'), fx:s=>{ hurt(s,3); fear(s,2); }, go:'lab_destroy' },
+    { t:'Отойти', go:'lab_hall' }
+  ] };
+
+S.lab_listen = { t:'Хор',
+  text:`Ты не хотел слушать. Но как не слушать то, что уже слышишь?
+
+Нота раскрывается. Это не одна нота и не десятки голосов. Это один голос, который помнит, как звучат сотни тысяч лет. Он спрашивает, не называя слов: ты тоже один?
+
+Тебе не страшно. Это самое страшное.
+
+Рука сама тянется к стеклу.`,
+  ch:[
+    { t:'Прижать ладонь к стеклу и ответить', if:s=>s.san<=5, go:'end_choir' },
+    { t:'Вырвать себя из этого', fx:s=>{ flag(s,'heard'); fear(s,3); sys(s,'Ты слышал Хор: шаттл с тобой на борту рискует стать носителем'); }, go:'lab_core' }
+  ] };
+
+S.lab_destroy = { t:'Плазма',
+  text:`Резак шипит и вгрызается в стекло, потом в лёд. Лёд не плавится — он кричит. Все поющие станции, до последнего, разом берут одну ноту, а потом она рвётся.
+
+Раскалённый керн оседает в чёрные нити. Станция становится совсем тихой.`,
+  ch:[ { t:'Дождаться тишины', go:'end_silence' } ] };
+
+S.hangar_door = { t:'Ангарные двери',
+  text:s=>`Ангарные двери массивные, со шлюзовой панелью. Гнездо питания пусто: нужен предохранитель.${s.f.fuse_in ? '\n\nГнездо занято. Индикатор горит зелёным: питание есть.' : ''}`,
+  ch:[
+    { t:'Вставить предохранитель', if:s=>has(s,'fuse') && !s.f.fuse_in, fx:s=>{ take(s,'fuse'); flag(s,'fuse_in'); sys(s,'Питание ангара восстановлено'); } },
+    { t:'Войти в ангар', if:s=>s.f.fuse_in, go:'hangar' },
+    { t:'Назад', go:'corr' }
+  ] };
+
+S.hangar = { t:'Ангар',
+  text:s=>`Шаттл «Ласточка» стоит на стапеле, трап опущен. У трапа неподвижно стоит пилот Ольга, лицом к кораблю.${s.f.hangar_clear ? '\n\nПроход к трапу свободен.' : '\n\nОна поёт — совсем тихо. Для корабля.'}`,
+  ch:[
+    { t:'Включить рацию и бросить подальше', if:s=>has(s,'radio') && !s.f.hangar_clear, fx:s=>{ take(s,'radio'); flag(s,'hangar_clear'); }, note:'Рация плюётся статикой. Ольга идёт на звук, как сомнамбула.' },
+    { t:'Ударить ломиком', if:s=>has(s,'crowbar') && !s.f.hangar_clear, fx:s=>{ flag(s,'hangar_clear'); hurt(s,1); loud(s,1); fear(s,1); }, note:'Она даже не оборачивается. Звук после удара — и тишина, почти приличная.' },
+    { t:'Подкрасться', if:s=>!s.f.hangar_clear, fx:s=>{ flag(s,'hangar_clear'); hurt(s,2); fear(s,1); }, note:'Она слышит. Не нападает, а касается твоего плеча — и это страшнее. Ты отдёргиваешься и бежишь.' },
+    { t:'Подняться на борт', if:s=>s.f.hangar_clear, go:'shuttle' },
+    { t:'Выйти', go:'hangar_door' }
+  ] };
+
+S.shuttle = { t:'Кабина шаттла',
+  text:s=>`Тесная кабина. Два кресла, панель с пустым гнездом для навигационного кристалла.${has(s,'nav') ? '\n\nКристалл у тебя в кармане.' : ''}`,
+  ch:[
+    { t:'Вставить кристалл и запустить двигатели', if:s=>has(s,'nav'), fx:s=>{ take(s,'nav'); flag(s,'nav_used'); }, go:s=> s.f.overload ? 'end_clean_break' : (s.f.heard ? 'end_passenger' : 'end_escape') },
+    { t:'Навигации нет — вернуться', if:s=>!has(s,'nav'), go:'hangar', note:'Без навигационного кристалла шаттл не полетит.' },
+    { t:'Выйти из шаттла', go:'hangar' }
+  ] };
+
+/* ——— Концовки ——— */
+function E(id, title, kind, text){ S[id] = { t:title, end:true, kind:kind, text:text, ch:[] }; }
+
+E('end_escape','Одинокий рейс','good',s=>`«Ласточка» отрывается от стапеля мягко, будто сама станция тебя отпускает. В иллюминаторе «Эхо-7» уменьшается до светлой точки на фоне Мирры. Ты ждёшь песни. Её нет. Только гул двигателей и твоё дыхание — такое родное, что хочется плакать.
+
+Через шесть суток тебя подберёт патруль. На допросе ты расскажешь всё: про Хор, про лёд, про МАРТУ, шепчущую «не шумите». Тебе поверят, когда спутники покажут, что станция до сих пор поёт.
+
+Керн остался там. Он ждёт следующего, кто подойдёт слушать.`);
+
+E('end_passenger','Попутчик','bad',s=>`«Ласточка» уходит от станции чисто и мягко. Тишина в кабине кажется святой. Ты расслабляешься.
+
+Через час ловишь себя на том, что напеваешь. Одну ноту. Ту самую.
+
+Когда за тобой придут спасатели, ты будешь стоять у шлюза и тихо петь. Им понравится.`);
+
+E('end_clean_break','Чистый разрыв','best',s=>`Когда «Ласточка» отходит на безопасное расстояние, ты оборачиваешься к экрану. «Эхо-7» вспыхивает — сперва в одной точке, затем всей длиной. Нота растягивается в крик и обрывается.
+
+Наступает тишина. Настоящая.
+
+${s.f.heard ? 'В голове нота ещё звучит. С каждым днём тише. Врачи говорят: так бывает.' : 'У тебя дрожат руки. Ты наконец позволяешь себе выдохнуть.'}
+
+Керн больше никого не позовёт. Ты знаешь это так же ясно, как собственное имя.`);
+
+E('end_sacrifice','Тихий реактор','neutral',s=>`Ты стоишь у пульта и вручную держишь контур, пока нарастает гул. Станция звенит. Поющие в коридорах падают на колени, один за другим закрывая рты.
+
+— Спасибо, Лев, — говорит МАРТА. — Я рекомендовала этот вариант под номером ноль. Мне стыдно, что это сработало.
+
+Табло доходит до нуля. Ты не слышишь последней ноты Хора: реактор громче.`);
+
+E('end_too_late','Опоздал','bad',s=>`Табло доходит до нуля, а ты ещё не добрался до шаттла.
+
+Последнее, что ты слышишь: реактор берёт ноту выше, чем Хор мог когда-либо.`);
+
+E('end_signal_ok','Сигнал','good',s=>`Ты держишь дверь мостика, пока не немеют плечи. Хор бьётся в металл, потом отступает: что-то в нём устало. Или передумало.
+
+Через девятнадцать суток к Мирре подходит корабль службы спасения. Тебя находят живым. Станцию — поющей. Корабль остаётся на безопасной дистанции, и ты вдруг понимаешь, что твой сигнал заставил весь сектор отвернуться.
+
+Керн остаётся во льду. Но теперь о нём знают.`);
+
+E('end_signal_cost','Сигнал (цена)','neutral',s=>`Ты держишь дверь, пока не кончаются силы. Потом дверь поддаётся.
+
+Сигнал ушёл раньше. Через несколько недель корабли обойдут Мирру стороной. Они будут знать: туда нельзя.
+
+Это больше, чем успели сделать остальные.`);
+
+E('end_silence','Тишина','good',s=>`Впервые за одиннадцать суток ты слышишь собственное сердце.
+
+Станция безмолвна. Те, кто пел, лежат там, где стояли: тихие, спокойные, как люди, которых наконец отпустили. ${s.f.irina_alive ? 'Вахрушева умерла во сне, у себя в каюте, повернувшись лицом к стене.' : ''}
+
+МАРТА восстанавливает связь через двое суток. Ты передаёшь сигнал с мостика уже без помех. Через неделю приходит корабль.
+
+Ты не знаешь, был ли это выбор. Но он твой.`);
+
+E('end_choir','Хор принимает','weird',s=>`Ты прижимаешь ладонь к стеклу. Лёд отвечает теплом.
+
+Страха нет. Есть только очень долгое, очень ласковое одиночество, которое наконец перестало быть одиночеством.
+
+Нота внутри тебя раскрывается в аккорд. Ты стоишь рядом с остальными и поёшь.
+
+Когда придут спасатели, им тоже понравится.`);
+
+E('end_san','Третья нота','bad',s=>`Нота доходит до третьего тона. Ты чувствуешь, как что-то внутри раскрывается, как створка.
+
+Ты не помнишь, как оказался в коридоре. Рядом стоят люди. Они улыбаются. Ты тоже.
+
+Ты открываешь рот и подпеваешь.`);
+
+E('end_o2','Воздух','bad',s=>`Скафандр шипит в последний раз. Лёгкие просят того, чего нет.
+
+Последнее, что ты видишь, — красная полоса аварийной лампы. Последнее, что слышишь, — нота. Она звучит так спокойно, что даже не обидно.`);
+
+E('end_hp','Конец смены','bad',s=>`Ты оседаешь на пол. Холод металла приятен.
+
+Станция поёт над тобой, ровно и терпеливо, как колыбельную. Она никуда не спешит.`);
+/* ЭХО-7 — ядро (без DOM, чтобы тестировать в node) */
+function newState(){
+  return { hp:10, san:10, o2:100, inv:[], f:{}, noise:0, clock:null, scene:'start', msgs:[], moves:0 };
+}
+function visible(sc,s){ return (sc.ch||[]).filter(c=>!c.if || c.if(s)); }
+function settle(s){
+  if(S[s.scene].end) return null;
+  if(s.o2<=0) return 'end_o2';
+  if(s.hp<=0) return 'end_hp';
+  if(s.san<=0) return 'end_san';
+  if(s.clock!==null && s.clock<=0) return 'end_too_late';
+  return null;
+}
+function moveTo(s,id){
+  const sc=S[id];
+  if(!sc) throw new Error('no scene '+id);
+  if(!sc.safe && !sc.end) s.o2 -= (sc.cost||3);
+  if(s.clock!==null && !sc.end) s.clock -= 1;
+  s.scene=id; s.moves++;
+  if(sc.enter){ const r=sc.enter(s); if(r){ s.scene=r; } }
+  const d=settle(s); if(d) s.scene=d;
+}
+function choose(s,i){
+  const sc=S[s.scene], vis=visible(sc,s), c=vis[i];
+  if(!c) return false;
+  if(c.fx) c.fx(s);
+  if(c.note) s.msgs.push({k:'n',t:c.note});
+  const tgt = typeof c.go==='function' ? c.go(s) : c.go;
+  if(tgt) moveTo(s,tgt);
+  else { const d=settle(s); if(d) s.scene=d; }
+  return true;
+}
+function useItem(s,item){
+  const k=s.inv.indexOf(item); if(k<0) return;
+  if(item==='med'){ s.inv.splice(k,1); heal(s,4); }
+  else if(item==='sedative'){ s.inv.splice(k,1); calm(s,3); }
+  else if(item==='serum'){ s.inv.splice(k,1); s.f.heard=false; calm(s,3); sys(s,'Сыворотка подействовала: эхо в голове стихает'); }
+}
+function sceneText(sc,s){ return typeof sc.text==='function' ? sc.text(s) : sc.text; }
+function choiceLabel(c,s){ return typeof c.t==='function' ? c.t(s) : c.t; }
+if(typeof module!=='undefined') module.exports={newState,visible,settle,moveTo,choose,useItem,sceneText,choiceLabel};
+/* ЭХО-7 — интерфейс */
+const SAVE_KEY='echo7_save_v1', END_KEY='echo7_ends_v1';
+const TOTAL_ENDS = Object.values(S).filter(x=>x.end).length;
+let s = null;
+const $ = id => document.getElementById(id);
+
+const ICONS = {
+  lamp:'<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/>',
+  crowbar:'<path d="M5 20L17 8M17 8c2-2 4-1 3 1M17 8c-1-2 0-4 2-3"/>',
+  med:'<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M12 8v8M8 12h8"/>',
+  sedative:'<rect x="3" y="9" width="18" height="6" rx="3" transform="rotate(-40 12 12)"/><path d="M9.5 8.5l6 7"/>',
+  serum:'<path d="M9 3h6M10 3v6l-4 9a2 2 0 0 0 2 3h8a2 2 0 0 0 2-3l-4-9V3"/><path d="M8 15h8"/>',
+  card1:'<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18M6 15h5"/>',
+  card2:'<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18M6 15h5M16 14l1.2 1.2L19 13"/>',
+  fuse:'<rect x="8" y="3" width="8" height="18" rx="2"/><path d="M12 7v10M10 12h4"/>',
+  radio:'<rect x="5" y="8" width="14" height="12" rx="2"/><path d="M9 8l7-5M9 14h6M9 17h4"/>',
+  nav:'<path d="M12 3l6 6-6 12-6-12z"/><path d="M6 9h12M12 3v18"/>',
+  cutter:'<path d="M3 14h9l3-3h4v-3h-6l-2-2H8v5H3z"/><path d="M20 15l1.5 1.5M18 17l1 2M21 13l1 0"/>'
+};
+function icon(k){ return '<svg viewBox="0 0 24 24" aria-hidden="true">'+(ICONS[k]||'')+'</svg>'; }
+const REDUCED = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+let prev = null;
+
+function restartClass(el, cls){ el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); }
+function flash(kind){
+  const fx=$('fx'); fx.className=''; void fx.offsetWidth; fx.className=kind;
+  if(kind==='dmg'){ restartClass($('game'),'shake'); setTimeout(()=>$('game').classList.remove('shake'),500); }
+  if(kind==='fear'){ restartClass($('game'),'glitchy'); setTimeout(()=>$('game').classList.remove('glitchy'),750); }
+}
+function floatNum(barId, text, cls){
+  const bar=$(barId); if(!bar) return;
+  const f=document.createElement('span'); f.className='float '+cls; f.textContent=text;
+  bar.appendChild(f); setTimeout(()=>f.remove(),1400);
+}
+
+
+function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+function lsSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+function lsDel(k){ try{ localStorage.removeItem(k); }catch(e){} }
+let endsSeen = [];
+try{ endsSeen = JSON.parse(lsGet(END_KEY)||'[]'); }catch(e){ endsSeen=[]; }
+
+function save(){ if(s && !S[s.scene].end) lsSet(SAVE_KEY, JSON.stringify(s)); }
+
+function glitch(str, san){
+  if(san>3) return str;
+  const p = san<=1 ? 0.07 : san<=2 ? 0.045 : 0.025;
+  const sym = ['▒','░','~','·','†'];
+  let out='';
+  for(const ch of str){
+    if(/[а-яёa-z]/i.test(ch) && Math.random()<p) out += sym[Math.floor(Math.random()*sym.length)];
+    else out += ch;
+  }
+  return out;
+}
+const WHISPERS = ['…спой с нами…','…ты ведь слышишь…','…не бойся, это просто нота…','…ты не один…','…ещё чуть-чуть…'];
+
+function seg(n,max,cls,pv){
+  let h='';
+  for(let i=0;i<max;i++){
+    let c = (i<n?'on ':'')+cls;
+    if(pv!=null){ if(i>=n && i<pv) c+=' lost'; if(i<n && i>=pv) c+=' gain'; }
+    h+='<i class="'+c+'" style="--i:'+i+'"></i>';
+  }
+  return h;
+}
+
+function renderHud(){
+  const P = prev;
+  $('hp').innerHTML = seg(s.hp,10,'hp',P?P.hp:null);
+  $('san').innerHTML = seg(s.san,10,'san',P?P.san:null);
+  $('hpv').textContent = s.hp+'/10';
+  $('sanv').textContent = s.san+'/10';
+  const o = Math.max(0,Math.min(100,s.o2));
+  $('o2fill').style.width = o+'%';
+  $('o2fill').className = o<=20 ? 'low' : '';
+  $('o2val').textContent = Math.round(o)+'%';
+  $('clock').style.display = s.clock!==null ? 'flex' : 'none';
+  if(s.clock!==null) $('clockval').textContent = Math.max(0,s.clock);
+  document.body.classList.toggle('lowhp', s.hp<=3);
+  document.body.classList.toggle('lowsan', s.san<=3);
+
+  // эффекты изменений
+  if(P){
+    if(s.hp<P.hp){ flash('dmg'); floatNum('bar-hp','−'+(P.hp-s.hp),'neg'); }
+    else if(s.hp>P.hp){ flash('heal'); floatNum('bar-hp','+'+(s.hp-P.hp),'pos'); }
+    if(s.san<P.san){ flash('fear'); floatNum('bar-san','−'+(P.san-s.san),'fear'); }
+    else if(s.san>P.san){ flash('calm'); floatNum('bar-san','+'+(s.san-P.san),'pos'); }
+    if(s.o2>P.o2+5){ flash('air'); floatNum('bar-o2','+'+Math.round(s.o2-P.o2)+'%','pos'); }
+  }
+
+  // инвентарь
+  const counts = {}; s.inv.forEach(i=>counts[i]=(counts[i]||0)+1);
+  const inv = $('inv'); inv.innerHTML='';
+  const keys = Object.keys(counts);
+  if(!keys.length) inv.innerHTML = '<span class="muted">пусто</span>';
+  keys.forEach(k=>{
+    const usable = ['med','sedative','serum'].includes(k);
+    const el = document.createElement(usable?'button':'span');
+    const isNew = P && (!(k in P.counts) || counts[k]>P.counts[k]);
+    el.className = 'chip' + (usable?' use':'') + (isNew?' new':'');
+    el.innerHTML = icon(k)+'<span></span>';
+    el.lastChild.textContent = ITEMS[k] + (counts[k]>1?' ×'+counts[k]:'');
+    el.title = ITEM_DESC[k]||'';
+    if(usable) el.onclick = ()=>{ useItem(s,k); render(); };
+    inv.appendChild(el);
+  });
+  // заметки
+  const a = s.f.code_a?CODE.a:'??', b = s.f.code_b?CODE.b:'??', c = s.f.code_c?CODE.c:'??';
+  const nk = [s.f.code_a,s.f.code_b,s.f.code_c].filter(Boolean).length;
+  const codeNew = P && nk>P.codes;
+  let notes = '<div class="note'+(codeNew?' newn':'')+'"><b>Код реактора:</b> '+a+' · '+b+' · '+c+'</div>';
+  if(s.f.hint_cutter) notes += '<div class="note">Хор замолкает, если прогреть керн плазмой.</div>';
+  if(s.f.lore_ice) notes += '<div class="note">Нота идёт из-под льда Мирры.</div>';
+  $('notes').innerHTML = notes;
+  prev = { hp:s.hp, san:s.san, o2:s.o2, counts:counts, codes:nk };
+}
+
+function render(){
+  const sc = S[s.scene];
+  renderHud();
+  $('title').textContent = sc.t;
+  const tt=$('title'); if(!REDUCED) restartClass(tt,'tin');
+  // сообщения
+  const m = $('msgs'); m.innerHTML='';
+  s.msgs.forEach(x=>{
+    const d=document.createElement('div'); d.className = x.k==='n'?'narr':'sysmsg'; d.textContent=x.t; m.appendChild(d);
+  });
+  s.msgs.length = 0;
+  // текст
+  const raw = sceneText(sc,s);
+  const body = $('text'); body.innerHTML='';
+  let pi=0;
+  raw.split('\n\n').forEach(p=>{
+    if(!p.trim()) return;
+    const el=document.createElement('p'); el.textContent = glitch(p.trim(), s.san);
+    el.style.animationDelay = REDUCED?'0s':(0.15+pi*0.35)+'s'; pi++; body.appendChild(el);
+  });
+  const choiceBase = REDUCED?0:(0.15+pi*0.35+0.2);
+  if(s.san<=3 && !sc.end){
+    const w=document.createElement('p'); w.className='whisper';
+    w.textContent = WHISPERS[Math.floor(Math.random()*WHISPERS.length)]; w.style.animationDelay=(REDUCED?0:(0.15+pi*0.35))+'s'; body.appendChild(w);
+  }
+  document.body.className = 'san' + (s.san<=3?'3':s.san<=6?'6':'10');
+  // выборы
+  const box = $('choices'); box.innerHTML='';
+  if(sc.end){
+    if(!endsSeen.includes(s.scene)){ endsSeen.push(s.scene); lsSet(END_KEY, JSON.stringify(endsSeen)); }
+    lsDel(SAVE_KEY);
+    box.className = 'choices endbox kind-'+sc.kind;
+    const info=document.createElement('div'); info.className='endinfo';
+    info.innerHTML = '<div class="endtag">КОНЦОВКА</div><div class="endcount">Открыто концовок: '+endsSeen.length+' из '+TOTAL_ENDS+'</div>';
+    box.appendChild(info);
+    const b=document.createElement('button'); b.className='choice primary'; b.textContent='Начать заново'; b.style.animationDelay=(choiceBase+0.5)+'s';
+    b.onclick=()=>{ startGame(); }; box.appendChild(b);
+    const b2=document.createElement('button'); b2.className='choice'; b2.textContent='В главное меню'; b2.style.animationDelay=(choiceBase+0.6)+'s';
+    b2.onclick=showMenu; box.appendChild(b2);
+  } else {
+    box.className='choices';
+    visible(sc,s).forEach((c,i)=>{
+      const b=document.createElement('button'); b.className='choice' + (s.san<=4 && /прижать|ответить/i.test(choiceLabel(c,s))?' whisperc':'');
+      b.innerHTML = '<span class="num">'+(i+1)+'</span><span></span>';
+      b.lastChild.textContent = choiceLabel(c,s);
+      b.style.animationDelay=(choiceBase+i*0.08)+'s'; b.onclick=()=>pick(i); box.appendChild(b);
+    });
+  }
+  save();
+  window.scrollTo({top:0});
+}
+
+function pick(i){
+  const before = s.scene;
+  choose(s,i);
+  render();
+}
+
+document.addEventListener('keydown',e=>{
+  if($('game').style.display==='none') return;
+  const n = parseInt(e.key,10);
+  if(n>=1 && n<=9) { const vis = visible(S[s.scene],s); if(vis[n-1]) pick(n-1); }
+});
+
+function startGame(){
+  s = newState(); prev=null; showGame(); render();
+}
+function continueGame(){
+  try{ s = JSON.parse(lsGet(SAVE_KEY)); }catch(e){ s=null; }
+  if(!s || !S[s.scene]){ startGame(); return; }
+  prev=null; showGame(); render();
+}
+function showGame(){ $('menu').style.display='none'; $('game').style.display='block'; }
+function showMenu(){
+  $('game').style.display='none'; $('menu').style.display='flex'; document.body.className='';
+  $('contbtn').style.display = lsGet(SAVE_KEY) ? 'block' : 'none';
+  $('endsline').textContent = endsSeen.length ? 'Открыто концовок: '+endsSeen.length+' из '+TOTAL_ENDS : 'Концовок: '+TOTAL_ENDS+'. Найди их все.';
+}
+$('newbtn').onclick = ()=>{ lsDel(SAVE_KEY); startGame(); };
+$('contbtn').onclick = continueGame;
+$('menubtn').onclick = ()=>{ save(); showMenu(); };
+showMenu();
+
+
+/* ——— Живая звуковая волна («Хор») ——— */
+const cv = $('wave'), cx = cv.getContext('2d');
+function sizeWave(){
+  const r = window.devicePixelRatio||1;
+  cv.width = Math.floor(innerWidth*r); cv.height = Math.floor(200*r);
+  cx.setTransform(r,0,0,r,0,0);
+}
+addEventListener('resize', sizeWave); sizeWave();
+let waveAmp = 10;
+function drawWave(t){
+  const w=innerWidth, h=200;
+  cx.clearRect(0,0,w,h);
+  const inGame = s && $('game').style.display==='block';
+  const san = inGame ? s.san : 10;
+  const stress = (10-san)/10;
+  const target = (inGame?8:16) + stress*38 + (inGame?Math.min(s.noise,6)*4:0);
+  waveAmp += (target-waveAmp)*0.03;
+  const danger = inGame && s.clock!==null;
+  const rgb = danger ? '255,100,90' : stress>=0.6 ? '183,155,255' : '127,227,208';
+  const speed = 0.0006*(1+stress*3 + (danger?2:0));
+  for(let k=0;k<4;k++){
+    cx.beginPath();
+    for(let x=0;x<=w;x+=5){
+      const env = 0.55+0.45*Math.sin(x*0.0035 + t*0.00035*(k+1));
+      const y = h*0.68 + Math.sin(x*0.011*(1+k*0.55) + t*speed*(k+1)) * waveAmp*(1-k*0.2)*env
+              + (stress>0.6 ? (Math.random()-0.5)*stress*3 : 0);
+      x===0 ? cx.moveTo(x,y) : cx.lineTo(x,y);
+    }
+    cx.strokeStyle = 'rgba('+rgb+','+(0.30-k*0.06)+')';
+    cx.lineWidth = 1.6-k*0.2; cx.stroke();
+  }
+}
+let rafOn = true;
+function loop(t){ if(rafOn) drawWave(t); requestAnimationFrame(loop); }
+document.addEventListener('visibilitychange',()=>{ rafOn = !document.hidden; });
+if(REDUCED) drawWave(0); else requestAnimationFrame(loop);
+
+/* случайный глитч заголовка меню */
+setInterval(()=>{
+  const h=document.querySelector('#menu h1');
+  if(!h || $('menu').style.display==='none' || REDUCED) return;
+  h.classList.add('gl'); setTimeout(()=>h.classList.remove('gl'),360);
+}, 5200);
+</script>
+</body>
+</html>
