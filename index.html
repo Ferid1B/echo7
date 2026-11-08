@@ -242,6 +242,85 @@ body.lowhp .ecg polyline{animation-duration:.6s}
 .sndmini:hover{color:var(--acc)}
 .sndmini.off,.btn.sec.off{opacity:.55}
 .btn.sec{min-width:240px;padding:10px 28px;font-size:14px}
+
+/* ================= ГЛАВЫ, КАРТА, ДОСТИЖЕНИЯ, СТАТИСТИКА ================= */
+body.noscroll{overflow:hidden}
+.menurow{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.menurow .btn.sec{min-width:0;padding:10px 20px}
+#menu>*:nth-child(6){animation-delay:.3s}#menu>*:nth-child(7){animation-delay:.35s}#menu>*:nth-child(8){animation-delay:.4s}
+#menu>*:nth-child(9){animation-delay:.45s}#menu>*:nth-child(10){animation-delay:.5s}
+.btn.locked{opacity:.45;border-style:dashed}
+
+/* карта */
+.mapwrap.closed #mapbox{display:none}
+.mapbtn{background:none;border:0;color:var(--acc);font-family:"Share Tech Mono",ui-monospace,monospace;font-size:11px;letter-spacing:.12em;cursor:pointer;margin-left:10px;padding:0}
+.mapbtn:hover{text-shadow:0 0 8px var(--acc)}
+.mapsvg{width:100%;max-width:520px;height:auto;display:block;margin:2px auto 0}
+.m-ring{fill:none;stroke:#1d2a30;stroke-width:1.5}
+.m-ring.on{stroke:rgba(127,227,208,.45)}
+.m-edge{stroke:#1d2a30;stroke-width:1.4;stroke-dasharray:3 4}
+.m-edge.on{stroke:rgba(127,227,208,.5);stroke-dasharray:none}
+.m-node rect{fill:#0d1317;stroke:#1d2a30;stroke-width:1.2;transition:.4s}
+.m-node text{fill:#3a4a52;font-family:"Share Tech Mono",ui-monospace,monospace;font-size:9px;letter-spacing:.05em}
+.m-node.known rect{stroke:#2f4650}
+.m-node.known text{fill:#7b8a91}
+.m-node.vis rect{stroke:var(--acc);fill:#0f1d20;filter:drop-shadow(0 0 4px rgba(127,227,208,.35))}
+.m-node.vis text{fill:var(--acc)}
+.m-node.cur rect{animation:curPulse 1.5s ease-in-out infinite}
+@keyframes curPulse{50%{stroke:#fff;filter:drop-shadow(0 0 11px rgba(127,227,208,.95))}}
+.m-you{fill:var(--acc);filter:drop-shadow(0 0 5px var(--acc));animation:blink .9s infinite}
+.m-lock{fill:none;stroke:var(--warn);stroke-width:1.2}
+.m-dot{fill:#1d2a30;stroke:#2f4650;stroke-width:1.2}
+.m-node.vis .m-dot{fill:var(--acc);stroke:var(--acc)}
+.m-node.cur .m-dot{fill:#fff;stroke:var(--acc);filter:drop-shadow(0 0 8px var(--acc));animation:blink 1s infinite}
+.m-node.known text{font-size:11px}
+
+/* экраны */
+#screen{position:fixed;inset:0;z-index:30;background:rgba(8,11,14,.97);overflow:auto;animation:fade .3s}
+.screenin{max-width:760px;margin:0 auto;padding:22px 18px 60px}
+.screenhead{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}
+#screentitle{font-family:"Share Tech Mono",ui-monospace,monospace;letter-spacing:.2em;text-transform:uppercase;color:var(--acc);font-size:15px}
+.screenhead .btn.sec{min-width:0;padding:8px 18px;font-size:13px}
+.sumline{font-family:"Share Tech Mono",ui-monospace,monospace;color:var(--muted);font-size:13px;letter-spacing:.06em;margin-bottom:14px}
+.sumline b{color:var(--acc);font-weight:400}
+.achgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.achcard{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--line);background:var(--panel);border-radius:4px;padding:12px 14px;opacity:.5;transition:.3s}
+.achcard.on{opacity:1;border-color:rgba(127,227,208,.5);box-shadow:0 0 18px rgba(127,227,208,.08)}
+.achico{font-size:22px;color:#3a4a52;line-height:1.1}
+.achcard.on .achico{color:var(--warn);text-shadow:0 0 12px rgba(255,180,84,.7)}
+.acht{font-family:"Share Tech Mono",ui-monospace,monospace;letter-spacing:.06em;font-size:14px;margin-bottom:2px}
+.achcard.on .acht{color:var(--acc)}
+.achd{font-size:14px;color:var(--muted);line-height:1.4}
+.statch{font-family:"Share Tech Mono",ui-monospace,monospace;letter-spacing:.22em;color:var(--muted);font-size:12px;margin:20px 0 8px}
+.statrow{display:grid;grid-template-columns:minmax(120px,1.1fr) 2fr 48px;gap:12px;align-items:center;padding:6px 0;font-size:15px;color:#7b8a91}
+.statrow.mine{color:var(--text)}
+.statmine{font-family:"Share Tech Mono",ui-monospace,monospace;font-size:10px;letter-spacing:.1em;color:var(--acc);border:1px solid var(--acc);border-radius:3px;padding:0 5px;margin-left:6px;vertical-align:1px}
+.statbar{height:8px;background:#182227;border-radius:4px;overflow:hidden}
+.statbar i{display:block;height:100%;background:linear-gradient(90deg,#3a8fe0,var(--acc));border-radius:4px;transition:width 1s cubic-bezier(.3,.8,.3,1)}
+.statrow.mine .statbar i{box-shadow:0 0 10px rgba(127,227,208,.6)}
+.statpct{font-family:"Share Tech Mono",ui-monospace,monospace;font-size:13px;text-align:right}
+.privacy{margin-top:24px;font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
+
+/* всплывающее достижение */
+#toasts{position:fixed;top:14px;right:14px;z-index:70;display:flex;flex-direction:column;gap:10px;pointer-events:none}
+.toast{display:flex;gap:12px;align-items:center;min-width:250px;max-width:340px;background:#10181b;border:1px solid var(--warn);border-radius:6px;padding:11px 15px;box-shadow:0 0 28px rgba(255,180,84,.3);animation:toastIn .5s cubic-bezier(.2,1.3,.4,1)}
+.toast.out{animation:toastOut .5s ease-in forwards}
+.toasticon{font-size:26px;color:var(--warn);text-shadow:0 0 14px var(--warn);animation:spinIn .9s ease-out}
+.toasttag{font-family:"Share Tech Mono",ui-monospace,monospace;font-size:10px;letter-spacing:.25em;color:var(--warn)}
+.toasttitle{font-family:"Share Tech Mono",ui-monospace,monospace;font-size:16px;letter-spacing:.06em;color:var(--text)}
+.toastdesc{font-size:13px;color:var(--muted);line-height:1.35}
+@keyframes toastIn{0%{opacity:0;transform:translateX(60px) scale(.9)}100%{opacity:1;transform:none}}
+@keyframes toastOut{to{opacity:0;transform:translateX(60px)}}
+@keyframes spinIn{0%{transform:rotate(-180deg) scale(.2);opacity:0}100%{transform:none;opacity:1}}
+
+/* экран концовки */
+.endstat{margin-top:10px;font-size:15px;color:#aab6bb;max-width:34em;margin-left:auto;margin-right:auto;line-height:1.5;animation:fade .6s}
+.endach{border:1px solid rgba(255,180,84,.45);background:rgba(255,180,84,.05);border-radius:6px;padding:12px 14px;margin:10px 0;animation:fade .8s}
+.endachh{font-family:"Share Tech Mono",ui-monospace,monospace;letter-spacing:.22em;font-size:11px;color:var(--warn);margin-bottom:6px}
+.achrow{display:grid;grid-template-columns:22px auto 1fr;gap:8px;align-items:baseline;padding:3px 0;font-size:14px;color:var(--muted)}
+.achrow b{font-family:"Share Tech Mono",ui-monospace,monospace;font-weight:400;color:var(--text);letter-spacing:.05em}
+.achstar{color:var(--warn);text-shadow:0 0 10px var(--warn)}
+@media (max-width:520px){.statrow{grid-template-columns:1fr 1.4fr 42px;gap:8px}.achrow{grid-template-columns:20px 1fr}.achrow span:last-child{grid-column:2}.toast{min-width:0;max-width:calc(100vw - 28px)}}
 </style>
 </head>
 <body>
@@ -258,19 +337,21 @@ body.lowhp .ecg polyline{animation-duration:.6s}
   <p class="tag">Станция молчит одиннадцать суток. Ты проснулся не по расписанию. Они реагируют на звук, так что не шуми.</p>
   <button class="btn" id="newbtn">НОВАЯ ИГРА</button>
   <button class="btn" id="contbtn" style="display:none">ПРОДОЛЖИТЬ</button>
+  <button class="btn" id="c2btn">ГЛАВА II · ЗАКРЫТО</button>
+  <div class="menurow"><button class="btn sec" id="achbtn">ДОСТИЖЕНИЯ</button><button class="btn sec" id="statbtn">СТАТИСТИКА</button></div>
   <button class="btn sec" id="sndbtn">ЗВУК: ВКЛ</button>
   <div class="sub" id="endsline"></div>
-  <div class="sub">Выбирай кнопками или цифрами 1–9 · M — звук</div>
+  <div class="sub">Выбирай кнопками или цифрами 1–9 · M — звук · K — карта</div>
 </div>
 <div id="game">
   <div class="hud">
-    <div id="topline"><span class="sub mono" style="font-size:12px;color:var(--muted);letter-spacing:.14em">ЭХО-7</span><span><button id="sndbtn2" class="sndmini">ЗВУК</button> <button id="menubtn">МЕНЮ</button></span></div>
+    <div id="topline"><span class="sub mono" id="chlabel" style="font-size:12px;color:var(--muted);letter-spacing:.14em">ЭХО-7</span><span><button id="sndbtn2" class="sndmini">ЗВУК</button> <button id="menubtn">МЕНЮ</button></span></div>
     <div class="bars">
       <div class="bar" id="bar-hp"><div class="lab"><span>ЗДОРОВЬЕ<svg class="ecg" viewBox="0 0 60 14" aria-hidden="true"><polyline points="0,7 12,7 16,7 19,1 23,13 27,7 39,7 42,4 45,7 60,7"/></svg></span><b id="hpv"></b></div><div class="segs" id="hp"></div></div>
       <div class="bar" id="bar-san"><div class="lab"><span>РАССУДОК</span><b id="sanv"></b></div><div class="segs" id="san"></div></div>
       <div class="bar" id="bar-o2" style="grid-column:1/3"><div class="lab"><span>КИСЛОРОД</span><b id="o2val"></b></div><div class="o2bar"><div id="o2fill"></div></div></div>
     </div>
-    <div id="clock"><span>ПЕРЕГРУЗКА РЕАКТОРА</span><span>осталось шагов: <b id="clockval"></b></span></div>
+    <div id="clock"><span id="clocklab">ПЕРЕГРУЗКА РЕАКТОРА</span><span>осталось шагов: <b id="clockval"></b></span></div>
   </div>
   <div id="title"></div>
   <div id="msgs"></div>
@@ -279,8 +360,11 @@ body.lowhp .ecg polyline{animation-duration:.6s}
   <div class="panel">
     <div><h3>ИНВЕНТАРЬ</h3><div id="inv"></div></div>
     <div><h3>ЗАМЕТКИ</h3><div id="notes"></div></div>
+    <div id="mapwrap" class="mapwrap"><h3><span id="maptitle">КАРТА СТАНЦИИ</span> <button id="mapbtn" class="mapbtn">СВЕРНУТЬ</button></h3><div id="mapbox"></div></div>
   </div>
 </div>
+<div id="screen" style="display:none"><div class="screenin"><div class="screenhead"><div id="screentitle"></div><button class="btn sec" id="screenback">НАЗАД</button></div><div id="screenbody"></div></div></div>
+<div id="toasts"></div>
 <script>
 'use strict';
 /* ЭХО-7 — данные игры (часть 1: предметы, помощники, начало, коридор) */
@@ -303,12 +387,14 @@ function has(s,i){ return s.inv.includes(i); }
 function sys(s,t){ s.msgs.push({k:'sys',t:t}); }
 function give(s,i){ if(STACK.has(i) || !has(s,i)){ s.inv.push(i); sys(s,'Получено: '+ITEMS[i]); } }
 function take(s,i){ const k=s.inv.indexOf(i); if(k>=0) s.inv.splice(k,1); }
-function hurt(s,n){ s.hp=Math.max(0,s.hp-n); sys(s,'Здоровье −'+n); }
+function hurt(s,n){ s.hp=Math.max(0,s.hp-n); s.stat.hurt+=n; sys(s,'Здоровье −'+n); }
 function heal(s,n){ s.hp=Math.min(10,s.hp+n); sys(s,'Здоровье +'+n); }
 function fear(s,n){ s.san=Math.max(0,s.san-n); sys(s,'Рассудок −'+n); }
 function calm(s,n){ s.san=Math.min(10,s.san+n); sys(s,'Рассудок +'+n); }
 function air(s,n){ s.o2=Math.min(100,s.o2+n); sys(s,'Кислород +'+n+'%'); }
-function loud(s,n){ s.noise+=(n||1); }
+function loud(s,n){ s.noise+=(n||1); s.stat.loud+=(n||1); }
+function kill(s){ s.stat.kills+=1; }
+function hear(s){ s.f.heard=true; s.f.heard_ever=true; }
 function flag(s,k){ s.f[k]=true; }
 function codesKnown(s){ return s.f.code_a && s.f.code_b && s.f.code_c; }
 
@@ -370,9 +456,9 @@ S.sing1 = { t:'Поющий в коридоре',
   ch:[
     { t:'Замереть и тихо пройти мимо вдоль стены', fx:s=>{ flag(s,'sing1'); fear(s,1); }, go:'corr',
       note:'Ты идёшь, не дыша. Каждый шаг — как по тонкому льду. Давид не оборачивается.' },
-    { t:'Ударить его ломиком', if:s=>has(s,'crowbar'), fx:s=>{ flag(s,'sing1'); flag(s,'david_dead'); hurt(s,1); loud(s,1); give(s,'radio'); }, go:'corr',
+    { t:'Ударить его ломиком', if:s=>has(s,'crowbar'), fx:s=>{ flag(s,'sing1'); flag(s,'david_dead'); kill(s); hurt(s,1); loud(s,1); give(s,'radio'); }, go:'corr',
       note:'Удар. Ещё. Он даже не пытается защищаться — просто перестаёт петь. Тишина после этого звука оглушает. В кармане его комбинезона — портативная рация, ещё тёплая.' },
-    { t:'Броситься на него голыми руками', if:s=>!has(s,'crowbar'), fx:s=>{ flag(s,'sing1'); flag(s,'david_dead'); hurt(s,4); loud(s,1); give(s,'radio'); }, go:'corr',
+    { t:'Броситься на него голыми руками', if:s=>!has(s,'crowbar'), fx:s=>{ flag(s,'sing1'); flag(s,'david_dead'); kill(s); hurt(s,4); loud(s,1); give(s,'radio'); }, go:'corr',
       note:'Он тяжелее, чем выглядит, и руки у него сильные. Но драка кончается быстро, и после неё очень тихо. В кармане — рация.' },
     { t:'Отступить в криоотсек', go:'bay' }
   ] };
@@ -399,7 +485,7 @@ S.sing2 = { t:'Они услышали',
       note:'Ты влетаешь в отсек и всем весом налегаешь на рычаг. Они бьются в дверь, потом перестают. Поют. Долго. Потом уходят.' },
     { t:'Включить рацию Давида на полную и бросить подальше', if:s=>has(s,'radio'), fx:s=>{ flag(s,'sing2'); s.noise=0; take(s,'radio'); }, go:'corr',
       note:'Рация орёт треском эфира. Они разворачиваются на звук, как подсолнухи на свет. Ты проскальзываешь мимо.' },
-    { t:'Драться', fx:s=>{ flag(s,'sing2'); s.noise=0; hurt(s,5); fear(s,1); }, go:'corr',
+    { t:'Драться', fx:s=>{ flag(s,'sing2'); s.noise=0; kill(s); hurt(s,5); fear(s,1); }, go:'corr',
       note:'Это длится дольше, чем ты думал. Потом остаётся только твоё тяжёлое дыхание и тишина.' }
   ] };
 /* ЭХО-7 — данные игры (часть 2: жилое кольцо, камбуз, машинное, внешний выход) */
@@ -462,7 +548,7 @@ S.irina_listen = { t:'Каюта доктора',
 — Лев, не слушай до конца!
 
 Но ты уже услышал достаточно. Код А — сорок один — записан у тебя в голове, как и ещё кое-что: «нагреть керн до температуры плазмы». Эта мысль не твоя.`,
-  ch:[ { t:'Вырваться и выйти', fx:s=>{ flag(s,'irina_done'); flag(s,'irina_alive'); flag(s,'code_a'); flag(s,'heard'); flag(s,'hint_cutter'); fear(s,3); sys(s,'Код реактора: часть А записана'); sys(s,'Ты слышал Хор: шаттл с тобой на борту рискует стать носителем'); }, go:'living' } ] };
+  ch:[ { t:'Вырваться и выйти', fx:s=>{ flag(s,'irina_done'); flag(s,'irina_alive'); flag(s,'code_a'); hear(s); flag(s,'hint_cutter'); fear(s,3); sys(s,'Код реактора: часть А записана'); sys(s,'Ты слышал Хор: шаттл с тобой на борту рискует стать носителем'); }, go:'living' } ] };
 
 S.irina_kill = { t:'Каюта доктора',
   text:`Ты бьёшь быстро, пока она ещё в себе. Она не сопротивляется. Только успевает сказать:
@@ -470,7 +556,7 @@ S.irina_kill = { t:'Каюта доктора',
 — Спасибо.
 
 На койке остаётся блокнот. В нём — «41» обведено дважды. Ничего больше.`,
-  ch:[ { t:'Забрать блокнот и выйти', fx:s=>{ flag(s,'irina_done'); flag(s,'code_a'); flag(s,'hint_cutter'); fear(s,2); hurt(s,1); loud(s,1); sys(s,'Код реактора: часть А записана'); }, go:'living' } ] };
+  ch:[ { t:'Забрать блокнот и выйти', fx:s=>{ flag(s,'irina_done'); flag(s,'irina_killed'); flag(s,'code_a'); flag(s,'hint_cutter'); kill(s); fear(s,2); hurt(s,1); loud(s,1); sys(s,'Код реактора: часть А записана'); }, go:'living' } ] };
 
 S.cab_irina_after = { t:'Каюта доктора',
   text:s=>s.f.irina_alive
@@ -685,7 +771,7 @@ S.lab_listen = { t:'Хор',
 Рука сама тянется к стеклу.`,
   ch:[
     { t:'Прижать ладонь к стеклу и ответить', if:s=>s.san<=5, go:'end_choir' },
-    { t:'Вырвать себя из этого', fx:s=>{ flag(s,'heard'); fear(s,3); sys(s,'Ты слышал Хор: шаттл с тобой на борту рискует стать носителем'); }, go:'lab_core' }
+    { t:'Вырвать себя из этого', fx:s=>{ hear(s); fear(s,3); sys(s,'Ты слышал Хор: шаттл с тобой на борту рискует стать носителем'); }, go:'lab_core' }
   ] };
 
 S.lab_destroy = { t:'Плазма',
@@ -706,7 +792,7 @@ S.hangar = { t:'Ангар',
   text:s=>`Шаттл «Ласточка» стоит на стапеле, трап опущен. У трапа неподвижно стоит пилот Ольга, лицом к кораблю.${s.f.hangar_clear ? '\n\nПроход к трапу свободен.' : '\n\nОна поёт — совсем тихо. Для корабля.'}`,
   ch:[
     { t:'Включить рацию и бросить подальше', if:s=>has(s,'radio') && !s.f.hangar_clear, fx:s=>{ take(s,'radio'); flag(s,'hangar_clear'); }, note:'Рация плюётся статикой. Ольга идёт на звук, как сомнамбула.' },
-    { t:'Ударить ломиком', if:s=>has(s,'crowbar') && !s.f.hangar_clear, fx:s=>{ flag(s,'hangar_clear'); hurt(s,1); loud(s,1); fear(s,1); }, note:'Она даже не оборачивается. Звук после удара — и тишина, почти приличная.' },
+    { t:'Ударить ломиком', if:s=>has(s,'crowbar') && !s.f.hangar_clear, fx:s=>{ flag(s,'hangar_clear'); kill(s); hurt(s,1); loud(s,1); fear(s,1); }, note:'Она даже не оборачивается. Звук после удара — и тишина, почти приличная.' },
     { t:'Подкрасться', if:s=>!s.f.hangar_clear, fx:s=>{ flag(s,'hangar_clear'); hurt(s,2); fear(s,1); }, note:'Она слышит. Не нападает, а касается твоего плеча — и это страшнее. Ты отдёргиваешься и бежишь.' },
     { t:'Подняться на борт', if:s=>s.f.hangar_clear, go:'shuttle' },
     { t:'Выйти', go:'hangar_door' }
@@ -794,17 +880,537 @@ E('end_o2','Воздух','bad',s=>`Скафандр шипит в послед�
 E('end_hp','Конец смены','bad',s=>`Ты оседаешь на пол. Холод металла приятен.
 
 Станция поёт над тобой, ровно и терпеливо, как колыбельную. Она никуда не спешит.`);
-/* ЭХО-7 — ядро (без DOM, чтобы тестировать в node) */
-function newState(){
-  return { hp:10, san:10, o2:100, inv:[], f:{}, noise:0, clock:null, scene:'start', msgs:[], moves:0 };
+/* ЭХО-7 — Глава II «Глубина»: сюжет, зависящий от итога главы I */
+ITEMS.charge='Подрывной заряд'; ITEMS.canister='Кислородная канистра';
+ITEM_DESC.charge='Хватит, чтобы обрушить шахту над Сердцем.'; ITEM_DESC.canister='+30% кислорода.';
+
+const LEV_ALIVE = ['end_silence','end_clean_break','end_escape','end_passenger','end_signal_ok'];
+function groupOf(end){
+  if(end==='end_silence') return 'silent';
+  if(['end_clean_break','end_sacrifice','end_too_late'].includes(end)) return 'ruin';
+  if(['end_signal_ok','end_signal_cost'].includes(end)) return 'warned';
+  if(end==='end_escape') return 'survivor';
+  if(end==='end_passenger') return 'carrier';
+  return 'lost';
 }
-function visible(sc,s){ return (sc.ch||[]).filter(c=>!c.if || c.if(s)); }
+const GROUP_BLURB = {
+  silent:'станция молчит, Хор мёртв, но не до конца', ruin:'станции больше нет, от неё остались обломки',
+  warned:'сектор закрыт, но сигнал унёс что-то с собой', survivor:'Лев вернулся, станция всё ещё поёт',
+  carrier:'Лев вернулся, но принёс Хор с собой', lost:'в живых никого, станция поёт'
+};
+function mem(s){ s.f.used_mem=true; }
+function applyMemory(s,id){
+  const r=(meta().runs1||{})[id]||{}, f=r.f||{}, st=r.stat||{};
+  s.f.ch1=id; s.f.g=groupOf(id); s.f.lev=LEV_ALIVE.includes(id);
+  s.f.m_codes=!!(f.code_a&&f.code_b&&f.code_c); s.f.m_heard=!!f.heard_ever; s.f.m_irina=!!f.irina_alive;
+  s.f.m_cutter=!!f.hint_cutter; s.f.m_ice=!!f.lore_ice; s.f.m_david=!!f.david_dead; s.f.m_irina_killed=!!f.irina_killed;
+  s.f.m_killer=(st.kills||0)>=2; s.f.m_pacifist=(st.kills||0)===0;
+  if(s.f.m_killer) s.noise=2;
+}
+const G = s => s.f.g;
+
+S.__menu = { t:'', safe:true, text:'', ch:[] };
+
+S.c2_pick = { t:'Глава II · Память', safe:true,
+  text:`Прошло девятнадцать суток.
+
+Кто-то должен был вернуться на Мирру. Игра помнит, чем закончилась твоя прошлая глава, и от этого зависит всё: что ты найдёшь на месте станции, кто окажется на борту и что ты знаешь о Хоре.
+
+Выбери итог, с которого начнётся новая глава.`,
+  ch:s=>{
+    const runs = meta().runs1 || {};
+    const list = Object.keys(runs).filter(id=>S[id]).map(id=>({
+      t:'«'+S[id].t+'» · '+GROUP_BLURB[groupOf(id)], fx:s2=>applyMemory(s2,id), go:'c2_intro' }));
+    return list.concat([{ t:'Назад в меню', go:'__menu' }]);
+  } };
+
+S.c2_intro = { t:'Досье', safe:true,
+  text:s=>{
+    const g=G(s), lines=[];
+    const head = {
+      silent:`«Эхо-7» молчит девятнадцать суток. Спасатели нашли единственного живого, Льва Савина, и он сейчас в медотсеке «Кормчего». Станция цела, но сейсмодатчики Мирры по-прежнему ловят ту же ноту. Теперь она идёт не со станции, а из-под неё.`,
+      ruin:`«Эхо-7» больше нет. От станции осталось поле обломков на орбите Мирры. Самописец вернул последние минуты, в них была перегрузка реактора. Но среди обломков по-прежнему слышен тон, тише, чем раньше, и тот же.`,
+      warned:`Сигнал «Эхо-7» услышали. Сектор закрыт на карантин, но через неделю ретрансляторы вдоль трассы начали передавать странный низкий тон. Сигнал ушёл со всем, что в нём было.`,
+      survivor:`Лев Савин вернулся живым и теперь служит консультантом на «Кормчем». «Эхо-7» цела и по-прежнему поёт. Корабль вышел к Мирре, чтобы закончить то, что не закончил он.`,
+      carrier:`Лев Савин вернулся живым, но в карантине он напевает одну и ту же ноту. Врачи не знают, что делать. Станция, судя по приборам, не умолкала ни на час.`,
+      lost:`От предыдущего экипажа остался только бортовой журнал: чьи-то последние записи. «Эхо-7» по-прежнему поёт. «Кормчий» вышел на орбиту Мирры, чтобы узнать, что там случилось.`
+    }[g];
+    lines.push(head);
+    lines.push('Ты, Мара Ким, офицер спасательной службы. Цель простая: спуститься к источнику и покончить с ним. Как именно, решишь сама.');
+    const m=[];
+    if(s.f.m_codes) m.push('В материалах Савина записан весь код перегрузки реактора: 41 · 07 · 93.');
+    if(s.f.m_heard) m.push('Савин слышал Хор до конца. Его записи содержат расшифровку тона: на него можно попробовать ответить.');
+    if(s.f.m_irina) m.push('Доктор Вахрушева оставила схему «ответной ноты».');
+    if(s.f.m_ice) m.push('Нота идёт из-под льда Мирры: ты знаешь, где искать источник.');
+    if(s.f.m_cutter) m.push('Записи говорят: Хор замолкает, если его прогреть.');
+    if(s.f.m_pacifist) m.push('Савин никого не тронул. Поющие, возможно, это помнят.');
+    if(s.f.m_killer) m.push('Савин оставил за собой тела. Поющие запомнили запах насилия: на станции будет шумнее.');
+    if(s.f.m_david) m.push('Давид Давидов погиб от руки Савина.');
+    if(m.length) lines.push('Что ты знаешь из прошлой главы:\n\n'+m.join('\n\n'));
+    return lines.join('\n\n');
+  },
+  ch:[ { t:'Подняться на борт «Кормчего»', go:'c2_ship' } ] };
+
+S.c2_ship = { t:'«Кормчий»', safe:true,
+  text:s=>`Спасательный корабль «Кормчий» дрейфует на орбите Мирры. В коридорах пахнет озоном и кофе. После «Эхо-7» это почти невыносимо живой запах.
+
+Капитан Рейн Аксёнов ждёт тебя в штабной. В арсенале собирают снаряжение, в медотсеке дежурит доктор Ясмин. До выхода к цели остаётся немного времени.${s.f.picks?'\n\nТы уже взяла снаряжение: '+s.f.picks+' из 3.':''}`,
+  ch:[
+    { t:'Выслушать капитана Рейна', go:'c2_brief' },
+    { t:'Зайти в арсенал', go:'c2_armory' },
+    { t:'Зайти в медотсек', go:'c2_medbay' },
+    { t:'Выйти к цели', go:'c2_eva' }
+  ] };
+
+S.c2_brief = { t:'Штабная', safe:true,
+  text:s=>{
+    const g=G(s);
+    const v={
+      silent:'— Станция молчит, — говорит Рейн. — Но под ней что-то есть. Савин называет это Сердцем.',
+      ruin:'— Станции нет, но обломки поют, — говорит Рейн. — Значит, дело не в ней. Дело в том, что под ней.',
+      warned:'— Мы закрыли сектор, — говорит Рейн. — Но ретрансляторы поют. Источник один: под станцией.',
+      survivor:'— Савин жив, станция жива, — говорит Рейн. — И я не уверен, что это хорошая новость.',
+      carrier:'— Савин поёт, — говорит Рейн. — И я не уверен, что ему можно доверять. Но он знает дорогу.',
+      lost:'— У нас нет живых свидетелей, — говорит Рейн. — Только журнал и тишина в эфире.'
+    }[g];
+    return v+`\n\nОн раскладывает на столе схему: буровая шахта уходит под лёд на несколько сотен метров. Там пещера, а в ней источник.\n\n— У тебя три варианта, Ким. Закрыть шахту подрывным зарядом, и тогда нужно успеть подняться. Попытаться понять, чего оно хочет. Или уйти и оставить карантин навсегда. Решать тебе: ты будешь там одна.`;
+  },
+  ch:[ { t:'Вернуться', fx:s=>flag(s,'briefed'), go:'c2_ship' } ] };
+
+S.c2_armory = { t:'Арсенал', safe:true,
+  text:s=>`Стеллажи, ящики, запах оружейной смазки. Ты можешь унести не всё: рюкзак вмещает три предмета. Выбирай с умом.\n\nВзято: ${s.f.picks||0} из 3.`,
+  ch:[
+    { t:'Подрывной заряд', if:s=>!has(s,'charge') && (s.f.picks||0)<3, fx:s=>{ s.f.picks=(s.f.picks||0)+1; give(s,'charge'); } },
+    { t:'Кислородная канистра', if:s=>!s.f.can && (s.f.picks||0)<3, fx:s=>{ s.f.picks=(s.f.picks||0)+1; flag(s,'can'); air(s,30); } },
+    { t:'Аптечка', if:s=>(s.f.picks||0)<3 && s.inv.filter(i=>i==='med').length<2, fx:s=>{ s.f.picks=(s.f.picks||0)+1; give(s,'med'); } },
+    { t:'Седатив', if:s=>!has(s,'sedative') && (s.f.picks||0)<3, fx:s=>{ s.f.picks=(s.f.picks||0)+1; give(s,'sedative'); } },
+    { t:'Налобный фонарь', if:s=>!has(s,'lamp'), fx:s=>{ give(s,'lamp'); } },
+    { t:'Вернуться', go:'c2_ship' }
+  ] };
+
+S.c2_medbay = { t:'Медотсек', safe:true,
+  text:s=>{
+    const g=G(s);
+    if(g==='carrier') return `В изоляторе за стеклом сидит Лев Савин. Он не смотрит на тебя. Он тихо тянет одну ноту, ровную и спокойную. Доктор Ясмин качает головой: «Никаких агрессивных реакций. Но он не останавливается уже сутки».`;
+    if(s.f.lev) return `Лев Савин сидит на койке с кружкой остывшего чая. Он бледен, но взгляд ясный. Увидев тебя, пытается улыбнуться.\n\n— Ты идёшь туда, — не спрашивает, а констатирует он.`;
+    return `Медотсек пуст, если не считать доктора Ясмин. Она перебирает записи, оставшиеся после предыдущей экспедиции, и не поднимает глаз.\n\n— Слушай. В журнале повторяется одно и то же: «не слушай до конца». Пожалуйста, не слушай.`;
+  },
+  ch:[
+    { t:'Поговорить', go:'c2_lev' },
+    { t:'Вернуться', go:'c2_ship' }
+  ] };
+
+S.c2_lev = { t:'Разговор', safe:true,
+  text:s=>{
+    const g=G(s);
+    if(g==='carrier') return `Ты подходишь к стеклу. Савин поднимает глаза, и на секунду в них появляется что-то человеческое.\n\n— Оно не злое, — шепчет он. — Оно одинокое. Если спустишься, не ломай его. Спроси.\n\nПотом снова уходит в ноту. Слушать её дольше нескольких секунд физически трудно.`;
+    if(g==='silent') return `— Оно спит, пока я слышу его, — говорит Савин. — Но спит неглубоко. Под станцией шахта, на дне Сердце. Там два пути: закрыть или ответить. Третьего нет.\n\nОн протягивает тебе кружку.`;
+    if(s.f.lev) return `— Держись тишины, — говорит Савин. — Не шуми. Не бей без нужды. И не слушай их до конца, даже если очень захочется.\n\nОн ненадолго замолкает.\n\n— Если услышишь голоса из зала в шахте, это не они. Это мы.`;
+    return `Доктор Ясмин вздыхает.\n\n— Здесь есть запись последнего выжившего: «Оно просто хочет, чтобы его слушали». Я не знаю, что это значит. Но если бы мне пришлось выбирать, я бы взяла заряд. На всякий случай.`;
+  },
+  ch:[
+    { t:'Слушать Савина до конца (рискованно)', if:s=>G(s)==='carrier' && !s.f.lev_heard, fx:s=>{ flag(s,'lev_heard'); s.f.m_heard=true; fear(s,2); mem(s); },
+      note:'Нота проходит сквозь стекло и входит под рёбра. Ты не понимаешь слов, но понимаешь интонацию. Теперь ты сможешь ответить.' },
+    { t:'Вернуться', go:'c2_medbay' }
+  ] };
+
+S.c2_eva = { t:'Выход', cost:4,
+  text:s=>{
+    const g=G(s);
+    const v={
+      silent:`Шлюз «Кормчего» открывается в чёрную пустоту. Внизу холодная и молчаливая «Эхо-7». Ни огонька, ни звука.`,
+      ruin:`Вместо станции перед тобой поле обломков: скрученный металл, обрывки проводов, замёрзшие капли. В радиоканале слабый тон, как эхо эха.`,
+      warned:`В пределах видимости мигает огонёк ретранслятора «Маяк-3». В наушниках слышен тот же тон, что и на станции. Он пришёл с сигналом.`,
+      survivor:`«Эхо-7» целая, тёмная, с редкими огоньками. В наушниках слабая нота, как дыхание.`,
+      carrier:`«Эхо-7» подсвечена прожекторами «Кормчего». В наушниках нота, и она совпадает с той, которую пел Савин.`,
+      lost:`«Эхо-7» дрейфует в темноте. На станции горят аварийные огни, красные и ровные. В наушниках нота.`
+    }[g];
+    return v;
+  },
+  ch:[
+    { t:'К ретранслятору «Маяк-3»', if:s=>G(s)==='warned', go:'c2_relay' },
+    { t:'К станции', if:s=>['silent','survivor','carrier','lost','warned'].includes(G(s)), go:'c2_station' },
+    { t:'К обломкам', if:s=>G(s)==='ruin', go:'c2_wreck' },
+    { t:'Напрямую к буровой шахте (ты знаешь, где она)', if:s=>s.f.m_ice, fx:s=>mem(s), go:'c2_shaft_top',
+      note:'Ты помнишь записи Савина о том, где находится шахта, и не заходишь внутрь.' },
+    { t:'Вернуться на «Кормчий»', go:'c2_ship' }
+  ] };
+
+S.c2_relay = { t:'Ретранслятор «Маяк-3»', cost:4,
+  text:`Ретранслятор висит в пустоте, как мёртвая птица. Индикаторы мигают в ритме ноты. Панель доступа открыта: кто-то уже был здесь, или что-то само открыло её.
+
+Сигнал, который ушёл с «Эхо-7», пронёс с собой не только слова. Здесь это слышно особенно отчётливо.`,
+  ch:[
+    { t:'Отключить питание ретранслятора', if:s=>!s.f.relay_off, fx:s=>{ flag(s,'relay_off'); fear(s,1); air(s,15); },
+      note:'Тон обрывается. В ушах ещё несколько секунд звенит, а потом настаёт тишина. На панели ты находишь запасной баллон.' },
+    { t:'Записать тон ретранслятора (рискованно)', if:s=>!s.f.m_heard, fx:s=>{ s.f.m_heard=true; fear(s,2); mem(s); },
+      note:'Ты записываешь тон в память скафандра и вдруг понимаешь, что узнаёшь его. Теперь ты сможешь ответить.' },
+    { t:'К станции', go:'c2_station' }
+  ] };
+
+S.c2_station = { t:'Станция «Эхо-7»', cost:4,
+  text:s=>{
+    const g=G(s);
+    let t=`Шлюз «Эхо-7» открыт: кто-то оставил его так. Внутри темно и тихо. В коридоре на разных расстояниях стоят люди, лицом к стене. Они поют: тихо, ровно, каждый свою ноту, и все вместе это складывается в один аккорд.`;
+    if(s.f.m_pacifist) t+=`\n\nПроходя мимо, ты ожидаешь удара, но они расступаются. Будто помнят: прошлый человек никого не тронул.`;
+    if(s.f.m_killer) t+=`\n\nПри твоём появлении несколько голов поворачиваются. Они запомнили запах насилия. Нота становится на полтона выше.`;
+    return t;
+  },
+  ch:[
+    { t:'Пройти спокойно мимо поющих', if:s=>s.f.m_pacifist, fx:s=>mem(s), go:'c2_shaft_top',
+      note:'Ни одна голова не поворачивается. Ты идёшь, как по улице спящего города.' },
+    { t:'Идти вдоль стены, не дыша', fx:s=>{ fear(s,1); if(s.noise>=2) hurt(s,2); }, go:'c2_shaft_top',
+      note:'Ты скользишь вдоль переборки. Один из поющих открывает глаза и снова закрывает.' },
+    { t:'Вернуться к шлюзу', go:'c2_eva' }
+  ] };
+
+S.c2_wreck = { t:'Поле обломков', cost:5,
+  text:`Обломки «Эхо-7» медленно вращаются. В разрыве корпуса виден срез: буровая шахта уходит вниз, как кишка. В вакууме нет звука, но нота идёт по радиоканалу скафандра.
+
+Вокруг дрейфуют замёрзшие тела тех, кто пел. Они лицом к шахте.`,
+  ch:[
+    { t:'Спуститься в разрыв, цепляясь за торчащие балки', fx:s=>{ hurt(s,1); fear(s,1); }, go:'c2_shaft_top' },
+    { t:'Вернуться к «Кормчему»', go:'c2_eva' }
+  ] };
+
+S.c2_shaft_top = { t:'Буровая шахта',
+  text:`Шахта уходит вниз на сотни метров. Трос подъёмника уходит в темноту, и оттуда идёт ледяной воздух. Он звенит.
+
+Ты закрепляешь страховку и проверяешь баллон. Дальше только вниз.`,
+  ch:[
+    { t:'Спуститься по тросу', go:'c2_d1' },
+    { t:'Вернуться', go:'c2_eva' }
+  ] };
+
+S.c2_d1 = { t:'Ледяной тоннель',
+  text:`Стены тоннеля прозрачны. Внутри льда нити, тонкие, как нервы, мигающие в такт ноте. Чем глубже, тем их больше.
+
+Тоннель извивается. Лёд под ногами скользкий, ступени выбиты неровно.`,
+  ch:[
+    { t:'Идти осторожно при свете фонаря', if:s=>has(s,'lamp'), go:'c2_d2' },
+    { t:'Идти наощупь (без фонаря опасно)', if:s=>!has(s,'lamp'), fx:s=>{ hurt(s,2); fear(s,1); }, go:'c2_d2' },
+    { t:'Подняться обратно', go:'c2_shaft_top' }
+  ] };
+
+S.c2_d2 = { t:'Зал отзвуков',
+  text:s=>{
+    let t=`Зал с гладкими стенами, и каждая из них возвращает голоса. Голоса тех, кто пел на станции. Они обращаются к тебе так, будто ты их знаешь.
+
+Орлова: «Ничего нельзя поднимать на борт».\n\nГоша: «Если нагреть, замолчит».`;
+    if(s.f.m_david) t+=`\n\nДавид: «Ты ударил меня. Я не чувствовал боли. Но ты ударил».`;
+    if(s.f.m_irina) t+=`\n\nВахрушева: «Спасибо, что не убил меня. Ответь им на ноту выше».`;
+    if(s.f.m_irina_killed) t+=`\n\nВахрушева: «Спасибо» — одно слово, и больше ничего.`;
+    return t;
+  },
+  ch:[
+    { t:'Слушать голоса', fx:s=>{ fear(s,1); }, go:'c2_d3', note:'Голоса сливаются в один. Он спрашивает, не больно ли тебе. Тебе не больно.' },
+    { t:'Закрыть уши и идти', go:'c2_d3' },
+    { t:'Ответить голосам', if:s=>s.f.m_heard, fx:s=>{ calm(s,1); mem(s); }, go:'c2_d3', note:'Ты отвечаешь той самой нотой. Голоса стихают, будто ждали. Тревога отступает.' }
+  ] };
+
+S.c2_d3 = { t:'Мост над провалом',
+  text:`Тоннель обрывается пропастью. Через неё перекинут ледяной мост шириной в ладонь, прозрачный, как стекло. Под ним пустота и свет: тусклый, голубой, живой.
+
+Мост дрожит. Он поёт.`,
+  ch:[
+    { t:'Перейти мост', fx:s=>{ if(s.san<=4) fear(s,1); }, go:'c2_chamber' },
+    { t:'Вернуться', go:'c2_d2' }
+  ] };
+
+S.c2_chamber = { t:'Сердце',
+  text:s=>{
+    let t=`Пещера размером с собор. Из свода свисают лёд и нити, они мигают и тянутся друг к другу. В центре сгусток света, самый яркий, самый тихий. Нота оттуда идёт не звуком, а давлением. Она везде.
+
+Это Сердце.`;
+    if(s.f.m_heard) t+=`\n\nОно узнаёт тебя. Ты уже слышала его, в записях Савина или от него самого. «Ты тоже одна?» спрашивает оно без слов.`;
+    t+=`\n\nУ тебя есть выбор.`;
+    return t;
+  },
+  ch:[
+    { t:'Установить подрывной заряд и уходить', if:s=>has(s,'charge'), fx:s=>{ take(s,'charge'); flag(s,'charge_set'); s.clock=6; }, go:'c2_run' },
+    { t:'Запустить дистанционную перегрузку реактора по коду Савина', if:s=>s.f.m_codes && G(s)!=='ruin', fx:s=>{ flag(s,'via_reactor'); mem(s); s.clock=6; }, go:'c2_run' },
+    { t:'Ответить на ноту', if:s=>s.f.m_heard || s.f.m_irina, fx:s=>mem(s), go:'c2_answer_pre' },
+    { t:'Взять осколок ядра', go:'c2_core' },
+    { t:'Подняться, ничего не делая', go:'c2_flee' }
+  ] };
+
+S.c2_run = { t:'Обратный отсчёт',
+  text:s=>s.f.via_reactor
+    ? `По связи с «Кормчим» Рейн подтверждает: перегрузка запущена. Шахта начнёт рушиться через несколько минут. Свет в пещере меняет цвет, нота ломается, срывается, поднимается на октаву.`
+    : `Заряд зажат в нитях. Таймер бежит. Свет в пещере меняет цвет, нота ломается, срывается, поднимается на октаву. Оно знает, что будет.`,
+  ch:[ { t:'Бежать к мосту', go:'c2_up1' } ] };
+
+S.c2_up1 = { t:'Подъём',
+  text:`Мост качается, голоса со всех сторон: «Не уходи. Подожди. Побудь ещё».
+
+Ты не оборачиваешься. Ты не имеешь права.`,
+  ch:[
+    { t:'Идти, не слушая', fx:s=>fear(s,1), go:'c2_up2' },
+    { t:'Крикнуть в ответ той самой нотой', if:s=>s.f.m_heard, fx:s=>{ calm(s,1); mem(s); }, go:'c2_up2' }
+  ] };
+
+S.c2_up2 = { t:'Шахта',
+  text:`Трос натянут, подъёмник визжит. Лёд над тобой трескается. Свет внизу дрожит.
+
+До поверхности шахты несколько десятков метров.`,
+  ch:[ { t:'Выбраться наверх', go:'c2_seal' } ] };
+
+S.c2_answer_pre = { t:'Ответ',
+  text:s=>`Ты набираешь воздух. Нота внутри тебя: ты знаешь её, Савин спел её тебе, или доктор записала её для тебя. Ты поёшь на тон выше.
+
+Пещера замирает. Нити перестают мигать. Свет в центре Сердца становится ровным, как дыхание спящего.`,
+  ch:[ { t:'Продолжать петь', fx:s=>fear(s,1), go:'c2_answer' } ] };
+
+/* ——— Концовки главы II ——— */
+E('c2_seal','Закрыто','good',s=>`Шахта обрушивается за твоей спиной с глухим, сочным звуком. Нота обрывается. Не стихает, а именно обрывается, как струна.
+
+На поверхности тебя ждёт «Кормчий». Рейн молча протягивает руку. Ты берёшь её.
+
+${s.f.via_reactor ? 'Реактор «Эхо-7» отдал последнюю энергию, и шахта запечатана. ' : 'Заряд сработал. '}Сейсмодатчики Мирры больше не фиксируют тон.
+
+${G(s)==='carrier' ? 'В карантине Лев Савин перестаёт напевать. Он спит впервые за много суток.' : G(s)==='silent' || G(s)==='survivor' ? 'Лев Савин, узнав новость, закрывает глаза и долго молчит. Потом тихо говорит: «Спасибо».' : 'Твой отчёт займёт сто страниц. Но на последней будет одно слово: «закрыто».'}`);
+
+E('c2_answer','Ответ','best',s=>`Ты поёшь, и Сердце слушает. Потом оно отвечает: не нотой, а тишиной, которой ты не слышала никогда. В ней нет одиночества.
+
+Свет в пещере растекается по стенам. Нити перестают мигать и повисают, как занавес.
+
+${s.f.m_irina ? 'Ты вспоминаешь схему доктора Вахрушевой. Она была права. ' : ''}${s.f.m_heard ? 'Запись Савина оказалась точной. ' : ''}
+
+Хор больше не поёт. Он просто есть: спокойный, огромный, старый. Рейн получает отчёт: источник нейтрализован без разрушений. Мирру закрывают для посещений, но под присмотром.
+
+Через год в архиве появится запись: «Контакт установлен». Ты не уверена, что слово «контакт» здесь подходит. Но это лучше, чем «война».`);
+
+E('c2_flee','Карантин','neutral',s=>`Ты поднимаешься по шахте, не оглядываясь. Хор не пытается тебя остановить. Он просто поёт.
+
+«Кормчий» берёт курс прочь от Мирры. Сектор закрывают на карантин навсегда. Карты перерисовывают, чтобы Мирра на них больше не появлялась.
+
+Но иногда по ночам, в тишине, ты слышишь одну ноту. Она тебе не снится. Она просто есть.`);
+
+E('c2_core','Осколок','bad',s=>`Ты берёшь осколок ядра, маленький, тёплый, живой. Он звенит у тебя в ладони, как камертон.
+
+Никто не узнает, что ты его взяла. Ты прячешь его в карман скафандра и поднимаешься наверх.
+
+На борту «Кормчего» никто не слышит ноты. Только ты. Через неделю ты замечаешь, что напеваешь.
+
+А через две тебя уже не удивляет, что остальные подпевают.`);
+
+E('c2_hp','Не дошла','bad',s=>`Ты оседаешь на лёд. Он тёплый, почти ласковый.
+
+Нота над тобой звучит ровно, терпеливо, как колыбельная. «Кормчий» ждёт на орбите ещё двое суток. Потом уходит.`);
+
+E('c2_o2','Воздух','bad',s=>`Датчик кислорода в последний раз пищит. Ты слишком глубоко и слишком далеко от шлюза.
+
+В ушах нота. Она звучит так спокойно, что даже не обидно.`);
+
+E('c2_san','Подпевать','bad',s=>`Нота доходит до третьего тона. Ты чувствуешь, как что-то внутри раскрывается, как створка.
+
+Ты не помнишь, как оказалась на дне. Вокруг тебя люди. Они улыбаются. Ты тоже.
+
+Ты открываешь рот и подпеваешь.`);
+
+E('c2_late','Опоздала','bad',s=>`Грохот шахты догоняет тебя на последних метрах. Лёд, камень, нота, оборвавшаяся на полуслове.
+
+«Кормчий» получает последний сигнал твоего скафандра. Больше ничего.`);
+/* ЭХО-7 — память между прогонами, достижения, общая статистика */
+const META_KEY='echo7_meta_v2', OLD_ENDS_KEY='echo7_ends_v1';
+// Публичные данные доступа к счётчику концовок. Ключ anon публичный по замыслу Supabase:
+// безопасность обеспечивают правила базы (можно только добавить название концовки и получить итоговые числа).
+const SB_URL='https://hcgefqvjqkrlggymzpjl.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhjZ2VmcXZqcWtybGdneW16cGpsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQxNjAzODYsImV4cCI6MjEwOTczNjM4Nn0.9Qv6v6iTBWlcUU6z9reT5uqkzcHFHCtqj_JGUgs_LuY';
+
+let _meta=null;
+function meta(){
+  if(_meta) return _meta;
+  let m=null;
+  try{ m=JSON.parse(localStorage.getItem(META_KEY)||'null'); }catch(e){}
+  if(!m || typeof m!=='object'){
+    m={ ends:[], counts:{}, ach:[], runs1:{}, c2done:0 };
+    try{ const o=JSON.parse(localStorage.getItem(OLD_ENDS_KEY)||'[]'); if(Array.isArray(o)) m.ends=o.filter(x=>S[x]); }catch(e){}
+  }
+  m.ends=m.ends||[]; m.counts=m.counts||{}; m.ach=m.ach||[]; m.runs1=m.runs1||{};
+  _meta=m; return m;
+}
+function saveMeta(){ try{ localStorage.setItem(META_KEY, JSON.stringify(_meta)); }catch(e){} }
+
+// выжить: эти концовки считаются «выжил»
+const SURVIVED = ['end_escape','end_clean_break','end_silence','end_signal_ok','c2_seal','c2_answer','c2_flee'];
+
+const ACH = [
+  { id:'first',    t:'Первая нота',        d:'Дойти до любой концовки.',                          test:c=>true },
+  { id:'ghost',    t:'Призрак',            d:'Выжить, ни разу не пошумев.',                       test:c=>c.surv && c.s.stat.loud===0 },
+  { id:'pacifist', t:'Не поднимая руки',   d:'Выжить, не причинив вреда никому.',                 test:c=>c.surv && c.s.stat.kills===0 },
+  { id:'iron',     t:'Железный',           d:'Выжить, ни разу не потеряв здоровье.',              test:c=>c.surv && c.s.stat.hurt===0 },
+  { id:'sane',     t:'Холодная голова',    d:'Выжить с рассудком не ниже 8.',                     test:c=>c.surv && c.s.san>=8 },
+  { id:'edge',     t:'На последнем вдохе', d:'Выжить, когда кислорода осталось 10% или меньше.', test:c=>c.surv && c.s.o2<=10 },
+  { id:'speed',    t:'Скоростной',         d:'Выжить в главе I, уложившись в 26 ходов.',          test:c=>c.surv && c.s.chapter===1 && c.s.moves<=26 },
+  { id:'listener', t:'Услышал',            d:'Услышать Хор до конца и всё равно выжить.',         test:c=>c.surv && c.s.f.heard_ever },
+  { id:'doctor',   t:'Не бросил',          d:'Не тронуть доктора Вахрушеву и получить её код.',   test:c=>c.s.chapter===1 && c.s.f.irina_alive && c.surv },
+  { id:'clean',    t:'Чистый разрыв',      d:'Взорвать станцию и улететь на шаттле.',             test:c=>c.id==='end_clean_break' },
+  { id:'silence',  t:'Тишина',             d:'Заставить Хор замолчать плазмой.',                  test:c=>c.id==='end_silence' },
+  { id:'signal',   t:'Голос в эфире',      d:'Отправить сигнал бедствия.',                        test:c=>c.id==='end_signal_ok' || c.id==='end_signal_cost' },
+  { id:'choir',    t:'Подпеть',            d:'Прижать ладонь к керну.',                           test:c=>c.id==='end_choir' },
+  { id:'collector',t:'Коллекционер',       d:'Открыть 6 разных концовок.',                        test:c=>c.m.ends.length>=6 },
+  { id:'ch2',      t:'Спуск',              d:'Дойти до конца главы II.',                          test:c=>c.s.chapter===2 },
+  { id:'seal',     t:'Закрыто',            d:'Запечатать шахту (глава II).',                      test:c=>c.id==='c2_seal' },
+  { id:'answer',   t:'Ответ',              d:'Ответить Хору его нотой (глава II).',               test:c=>c.id==='c2_answer' },
+  { id:'memory',   t:'Память',             d:'В главе II воспользоваться тем, что ты помнишь из главы I.', test:c=>c.s.chapter===2 && c.s.f.used_mem && c.surv },
+  { id:'all',      t:'Полная партитура',   d:'Открыть все концовки обеих глав.',                  test:c=>c.m.ends.length>=ALL_ENDS().length }
+];
+function ALL_ENDS(){ return Object.keys(S).filter(k=>S[k].end); }
+function chapterOfEnd(id){ return id.startsWith('c2_') ? 2 : 1; }
+
+function recordEnding(s,id){
+  const m=meta(), isNew=!m.ends.includes(id);
+  if(isNew) m.ends.push(id);
+  m.counts[id]=(m.counts[id]||0)+1;
+  if(s.chapter===1){ m.runs1[id]={ f:Object.assign({},s.f), stat:Object.assign({},s.stat), hp:s.hp, san:s.san }; }
+  else m.c2done=(m.c2done||0)+1;
+  const surv=SURVIVED.includes(id), unlocked=[];
+  for(const a of ACH){
+    if(m.ach.includes(a.id)) continue;
+    let ok=false; try{ ok=!!a.test({s:s,id:id,m:m,surv:surv}); }catch(e){}
+    if(ok){ m.ach.push(a.id); unlocked.push(a); }
+  }
+  saveMeta();
+  return { isNew:isNew, unlocked:unlocked };
+}
+function chapter2Open(){ return Object.keys(meta().runs1).some(id=>S[id]); }
+
+/* ——— общая статистика (Supabase) ——— */
+function sbFetch(path, opts){
+  if(typeof fetch!=='function') return Promise.reject(new Error('no fetch'));
+  const ctl = (typeof AbortController!=='undefined') ? new AbortController() : null;
+  const timer = setTimeout(()=>{ if(ctl) ctl.abort(); }, 6000);
+  const h = Object.assign({ apikey:SB_KEY, Authorization:'Bearer '+SB_KEY, 'Content-Type':'application/json' }, (opts&&opts.headers)||{});
+  return fetch(SB_URL+path, Object.assign({}, opts, { headers:h, signal: ctl?ctl.signal:undefined }))
+    .finally(()=>clearTimeout(timer));
+}
+function sendEnding(id){
+  return sbFetch('/rest/v1/echo7_endings', { method:'POST', headers:{ Prefer:'return=minimal' }, body:JSON.stringify({ ending:id }) })
+    .then(r=>r.ok).catch(()=>false);
+}
+function fetchStats(){
+  return sbFetch('/rest/v1/rpc/echo7_stats', { method:'POST', body:'{}' })
+    .then(r=>r.ok ? r.json() : null).then(j=> (j && typeof j==='object') ? j : null).catch(()=>null);
+}
+function statTotal(st){ return Object.values(st).reduce((a,b)=>a+(+b||0),0); }
+
+if(typeof module!=='undefined') module.exports={meta,recordEnding,ACH,SURVIVED,groupOf};
+/* ЭХО-7 — карта станции (глава I) и шкала глубины (глава II) */
+const SCENE_NODE = {
+  start:'bay', bay:'bay', marta:'bay', marta2:'bay', marta3:'bay',
+  sing1:'ring', corr:'ring', sing2:'ring',
+  living:'living', cab_david:'living', cab_irina:'living', irina_talk:'living', irina_listen:'living', irina_kill:'living',
+  cab_irina_after:'living', cab_cap_door:'living', cab_captain:'living',
+  mess:'mess', gosha:'mess',
+  eng:'eng', reactor:'reactor', reactor_locked:'eng', reactor_set:'reactor', airlock:'lock', ext:'ext', antenna:'ext',
+  bridge_door:'bridge', vent:'bridge', bridge:'bridge', timur:'bridge', broadcast:'bridge',
+  lab_lift:'lab', lab_hall:'lab', lab_fridge:'lab', lab_core:'lab', lab_listen:'lab', lab_destroy:'lab',
+  hangar_door:'hangar', hangar:'hangar', shuttle:'hangar'
+};
+const C2_DEPTH = {
+  c2_ship:0, c2_brief:0, c2_armory:0, c2_medbay:0, c2_lev:0,
+  c2_eva:1, c2_relay:2, c2_station:2, c2_wreck:2,
+  c2_shaft_top:3, c2_d1:4, c2_d2:5, c2_d3:6, c2_chamber:7, c2_run:7, c2_up1:6, c2_up2:3, c2_answer_pre:7
+};
+const C2_LABELS = ['«Кормчий»','Выход','Станция','Шахта','Тоннель','Зал отзвуков','Мост','Сердце'];
+
+function nodeOf(s){
+  if(s.chapter===2){ const d=C2_DEPTH[s.scene]; return d===undefined ? null : 'd'+d; }
+  return SCENE_NODE[s.scene] || null;
+}
+
+/* геометрия карты главы I */
+const CX=210, CY=140, RX=150, RY=96;
+const ROOMS = [
+  { id:'bay',    name:'КРИОТСЕК',     a:-90 },
+  { id:'mess',   name:'КАЮТ-КОМПАНИЯ',a:-38 },
+  { id:'lab',    name:'ЛАБОРАТОРИИ',  a:13 },
+  { id:'hangar', name:'АНГАР',        a:64 },
+  { id:'eng',    name:'МАШИННОЕ',     a:116 },
+  { id:'living', name:'ЖИЛОЕ КОЛЬЦО', a:167 },
+  { id:'bridge', name:'МОСТИК',       a:218 }
+];
+function roomPos(r){ const t=r.a*Math.PI/180; return { x:CX+RX*Math.cos(t), y:CY+RY*Math.sin(t) }; }
+
+function renderMap(s){
+  const vis=s.visited||[], cur=nodeOf(s), has2=id=>vis.includes(id);
+  const ringKnown = has2('ring');
+  if(s.chapter===2) return renderDepth(s,vis,cur);
+  const pos={}; ROOMS.forEach(r=>pos[r.id]=roomPos(r));
+  // дочерние узлы машинного отделения
+  pos.reactor={ x:pos.eng.x-78, y:pos.eng.y+46 };
+  pos.lock   ={ x:pos.eng.x+52, y:pos.eng.y+50 };
+  pos.ext    ={ x:pos.eng.x+142, y:pos.eng.y+50 };
+  const known = id => id==='bay' || has2(id) || (ringKnown && ROOMS.some(r=>r.id===id)) ||
+                      (id==='reactor' && has2('eng')) || (id==='lock' && has2('eng')) || (id==='ext' && has2('lock'));
+  let svg='<svg viewBox="0 0 420 330" class="mapsvg" role="img" aria-label="Карта станции">';
+  // кольцевой коридор
+  svg+='<ellipse cx="'+CX+'" cy="'+CY+'" rx="'+(RX*0.46)+'" ry="'+(RY*0.46)+'" class="m-ring'+(ringKnown?' on':'')+'"/>';
+  const edge=(a,b,on)=>'<line x1="'+a.x+'" y1="'+a.y+'" x2="'+b.x+'" y2="'+b.y+'" class="m-edge'+(on?' on':'')+'"/>';
+  ROOMS.forEach(r=>{
+    const p=pos[r.id], t=r.a*Math.PI/180;
+    const ip={ x:CX+RX*0.46*Math.cos(t), y:CY+RY*0.46*Math.sin(t) };
+    svg+=edge(ip,p, has2(r.id) && ringKnown);
+  });
+  svg+=edge(pos.eng,pos.reactor,has2('reactor'))+edge(pos.eng,pos.lock,has2('lock'))+edge(pos.lock,pos.ext,has2('ext'));
+  const lockIcon=(x,y)=>'<g class="m-lock" transform="translate('+(x-5)+','+(y-5)+')"><rect x="1" y="4" width="8" height="6" rx="1"/><path d="M2.5 4V2.5a2.5 2.5 0 0 1 5 0V4"/></g>';
+  const node=(id,name,w,h,locked)=>{
+    const p=pos[id], k=known(id), v=has2(id), c=cur===id;
+    let cls='m-node'+(k?' known':'')+(v?' vis':'')+(c?' cur':'');
+    let g='<g class="'+cls+'" transform="translate('+(p.x-w/2)+','+(p.y-h/2)+')">';
+    g+='<rect width="'+w+'" height="'+h+'" rx="4"/>';
+    g+='<text x="'+(w/2)+'" y="'+(h/2+3.5)+'" text-anchor="middle">'+(k?name:'?')+'</text>';
+    if(k && locked) g+=lockIcon(w-9,4);
+    if(c) g+='<circle class="m-you" cx="'+(w/2)+'" cy="'+(-7)+'" r="3.5"/>';
+    return g+'</g>';
+  };
+  const f=s.f;
+  ROOMS.forEach(r=>{
+    const locked = (r.id==='lab' && !has(s,'card1') && !has2('lab')) ||
+                   (r.id==='bridge' && !has(s,'card2') && !has2('bridge')) ||
+                   (r.id==='hangar' && !f.fuse_in && !has2('hangar'));
+    svg+=node(r.id,r.name,r.id==='mess'||r.id==='living'?94:84,26,locked);
+  });
+  svg+=node('reactor','РЕАКТОР',64,24,!has(s,'card1') && !has2('reactor'));
+  svg+=node('lock','ШЛЮЗ',50,24,false);
+  svg+=node('ext','СНАРУЖИ',60,24,false);
+  svg+='</svg>';
+  return svg;
+}
+
+function renderDepth(s,vis,cur){
+  let svg='<svg viewBox="0 0 420 ' + (C2_LABELS.length*34+20) + '" class="mapsvg" role="img" aria-label="Шкала глубины">';
+  const x=70;
+  svg+='<line x1="'+x+'" y1="22" x2="'+x+'" y2="'+((C2_LABELS.length-1)*34+22)+'" class="m-edge on"/>';
+  C2_LABELS.forEach((name,i)=>{
+    const y=22+i*34, id='d'+i, v=vis.includes(id), c=cur===id;
+    svg+='<g class="m-node known'+(v?' vis':'')+(c?' cur':'')+'">';
+    svg+='<circle cx="'+x+'" cy="'+y+'" r="'+(c?8:5)+'" class="m-dot"/>';
+    svg+='<text x="'+(x+22)+'" y="'+(y+4)+'">'+(v||i===0?name:'· · ·')+'</text>';
+    svg+='</g>';
+  });
+  return svg+'</svg>';
+}
+/* ЭХО-7 — ядро (без DOM, чтобы тестировать в node) */
+function newState(chapter){
+  return { hp:10, san:10, o2:100, inv:[], f:{}, noise:0, clock:null, scene:'start', msgs:[], moves:0,
+           chapter:chapter||1, visited:[], stat:{kills:0,loud:0,hurt:0} };
+}
+function fixState(s){ s.chapter=s.chapter||1; s.visited=s.visited||[]; s.stat=Object.assign({kills:0,loud:0,hurt:0}, s.stat||{}); return s; }
+function chOf(sc,s){ return typeof sc.ch==='function' ? sc.ch(s) : (sc.ch||[]); }
+function visible(sc,s){ return chOf(sc,s).filter(c=>!c.if || c.if(s)); }
+function markVisited(s){
+  const n = (typeof nodeOf==='function') ? nodeOf(s) : null;
+  if(n && !s.visited.includes(n)) s.visited.push(n);
+}
 function settle(s){
   if(S[s.scene].end) return null;
-  if(s.o2<=0) return 'end_o2';
-  if(s.hp<=0) return 'end_hp';
-  if(s.san<=0) return 'end_san';
-  if(s.clock!==null && s.clock<=0) return 'end_too_late';
+  const c2 = s.chapter===2;
+  if(s.o2<=0) return c2 ? 'c2_o2' : 'end_o2';
+  if(s.hp<=0) return c2 ? 'c2_hp' : 'end_hp';
+  if(s.san<=0) return c2 ? 'c2_san' : 'end_san';
+  if(s.clock!==null && s.clock<=0) return c2 ? 'c2_late' : 'end_too_late';
   return null;
 }
 function moveTo(s,id){
@@ -815,6 +1421,7 @@ function moveTo(s,id){
   s.scene=id; s.moves++;
   if(sc.enter){ const r=sc.enter(s); if(r){ s.scene=r; } }
   const d=settle(s); if(d) s.scene=d;
+  markVisited(s);
 }
 function choose(s,i){
   const sc=S[s.scene], vis=visible(sc,s), c=vis[i];
@@ -834,7 +1441,7 @@ function useItem(s,item){
 }
 function sceneText(sc,s){ return typeof sc.text==='function' ? sc.text(s) : sc.text; }
 function choiceLabel(c,s){ return typeof c.t==='function' ? c.t(s) : c.t; }
-if(typeof module!=='undefined') module.exports={newState,visible,settle,moveTo,choose,useItem,sceneText,choiceLabel};
+if(typeof module!=='undefined') module.exports={newState,fixState,visible,settle,moveTo,choose,useItem,sceneText,choiceLabel};
 /* ЭХО-7 — звук: всё синтезируется в браузере (Web Audio), файлов нет */
 const SND = (function(){
   const KEY='echo7_snd_v1', VOL=0.5;
@@ -933,6 +1540,7 @@ const SND = (function(){
       case 'air': for(let i=0;i<5;i++) tone(750+Math.random()*700,.06,'sine',.05,t+i*.06); burst(.5,.06,3000,'highpass',t); break;
       case 'pickup': tone(880,.07,'triangle',.1,t); tone(1175,.07,'triangle',.1,t+.07); tone(1568,.14,'triangle',.1,t+.14); break;
       case 'alarm': tone(880+(9-(arg||0))*35,.1,'square',.05,t); tone(880+(9-(arg||0))*35,.1,'square',.04,t+.16); break;
+      case 'achv': [784,988,1319,1568].forEach((f,i)=>tone(f,.28,'triangle',.1,t+i*.09)); break;
       case 'siren': tone(300,1.6,'sawtooth',.07,t,900); tone(305,1.6,'sawtooth',.05,t,910); break;
       case 'end':
         if(arg==='best') chord([261.6,329.6,392,523.3],3.2,'triangle',.11);
@@ -1006,7 +1614,7 @@ const SND = (function(){
            isOn:()=>enabled, hasCtx:()=>!!ac };
 })();
 /* ЭХО-7 — интерфейс */
-const SAVE_KEY='echo7_save_v1', END_KEY='echo7_ends_v1';
+const SAVE_KEY='echo7_save_v1';
 const TOTAL_ENDS = Object.values(S).filter(x=>x.end).length;
 let s = null;
 const $ = id => document.getElementById(id);
@@ -1022,7 +1630,9 @@ const ICONS = {
   fuse:'<rect x="8" y="3" width="8" height="18" rx="2"/><path d="M12 7v10M10 12h4"/>',
   radio:'<rect x="5" y="8" width="14" height="12" rx="2"/><path d="M9 8l7-5M9 14h6M9 17h4"/>',
   nav:'<path d="M12 3l6 6-6 12-6-12z"/><path d="M6 9h12M12 3v18"/>',
-  cutter:'<path d="M3 14h9l3-3h4v-3h-6l-2-2H8v5H3z"/><path d="M20 15l1.5 1.5M18 17l1 2M21 13l1 0"/>'
+  cutter:'<path d="M3 14h9l3-3h4v-3h-6l-2-2H8v5H3z"/><path d="M20 15l1.5 1.5M18 17l1 2M21 13l1 0"/>',
+  charge:'<circle cx="12" cy="14" r="7"/><path d="M12 7V3M10 3h4M9 14h6M12 11v6"/>',
+  canister:'<rect x="7" y="7" width="10" height="14" rx="3"/><path d="M10 7V4h4v3M9 12h6"/>'
 };
 function icon(k){ return '<svg viewBox="0 0 24 24" aria-hidden="true">'+(ICONS[k]||'')+'</svg>'; }
 const REDUCED = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -1044,8 +1654,6 @@ function floatNum(barId, text, cls){
 function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
 function lsSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
 function lsDel(k){ try{ localStorage.removeItem(k); }catch(e){} }
-let endsSeen = [];
-try{ endsSeen = JSON.parse(lsGet(END_KEY)||'[]'); }catch(e){ endsSeen=[]; }
 
 function save(){ if(s && !S[s.scene].end) lsSet(SAVE_KEY, JSON.stringify(s)); }
 
@@ -1084,6 +1692,10 @@ function renderHud(){
   $('o2val').textContent = Math.round(o)+'%';
   $('clock').style.display = s.clock!==null ? 'flex' : 'none';
   if(s.clock!==null) $('clockval').textContent = Math.max(0,s.clock);
+  $('chlabel').textContent = s.chapter===2 ? 'ЭХО-7 · ГЛАВА II' : 'ЭХО-7 · ГЛАВА I';
+  $('clocklab').textContent = s.chapter===2 ? 'ОБВАЛ ШАХТЫ' : 'ПЕРЕГРУЗКА РЕАКТОРА';
+  $('maptitle').textContent = s.chapter===2 ? 'ГЛУБИНА' : 'КАРТА СТАНЦИИ';
+  $('mapbox').innerHTML = renderMap(s);
   document.body.classList.toggle('lowhp', s.hp<=3);
   document.body.classList.toggle('lowsan', s.san<=3);
 
@@ -1116,12 +1728,23 @@ function renderHud(){
     inv.appendChild(el);
   });
   // заметки
-  const a = s.f.code_a?CODE.a:'??', b = s.f.code_b?CODE.b:'??', c = s.f.code_c?CODE.c:'??';
+  const c2 = s.chapter===2;
+  const hasA = c2 ? s.f.m_codes : s.f.code_a, hasB = c2 ? s.f.m_codes : s.f.code_b, hasC = c2 ? s.f.m_codes : s.f.code_c;
+  const a = hasA?CODE.a:'??', b = hasB?CODE.b:'??', c = hasC?CODE.c:'??';
   const nk = [s.f.code_a,s.f.code_b,s.f.code_c].filter(Boolean).length;
   const codeNew = P && nk>P.codes;
-  let notes = '<div class="note'+(codeNew?' newn':'')+'"><b>Код реактора:</b> '+a+' · '+b+' · '+c+'</div>';
-  if(s.f.hint_cutter) notes += '<div class="note">Хор замолкает, если прогреть керн плазмой.</div>';
-  if(s.f.lore_ice) notes += '<div class="note">Нота идёт из-под льда Мирры.</div>';
+  let notes = '';
+  if(!c2 || s.f.m_codes) notes += '<div class="note'+(codeNew?' newn':'')+'"><b>Код реактора:</b> '+a+' · '+b+' · '+c+'</div>';
+  if(!c2){
+    if(s.f.hint_cutter) notes += '<div class="note">Хор замолкает, если прогреть керн плазмой.</div>';
+    if(s.f.lore_ice) notes += '<div class="note">Нота идёт из-под льда Мирры.</div>';
+  } else {
+    if(s.f.m_ice) notes += '<div class="note">Ты знаешь, где буровая шахта.</div>';
+    if(s.f.m_heard) notes += '<div class="note">Ты можешь ответить Хору его нотой.</div>';
+    if(s.f.m_irina) notes += '<div class="note">У тебя схема «ответной ноты» Вахрушевой.</div>';
+    if(s.f.m_pacifist) notes += '<div class="note">Поющие, возможно, помнят, что Савин никого не тронул.</div>';
+    if(s.f.m_killer) notes += '<div class="note">Поющие помнят насилие: на станции будет шумнее.</div>';
+  }
   $('notes').innerHTML = notes;
   if(newItem) SND.sfx('pickup');
   prev = { hp:s.hp, san:s.san, o2:s.o2, counts:counts, codes:nk, clock:s.clock };
@@ -1162,16 +1785,7 @@ function render(){
   // выборы
   const box = $('choices'); box.innerHTML='';
   if(sc.end){
-    if(!endsSeen.includes(s.scene)){ endsSeen.push(s.scene); lsSet(END_KEY, JSON.stringify(endsSeen)); }
-    lsDel(SAVE_KEY);
-    box.className = 'choices endbox kind-'+sc.kind;
-    const info=document.createElement('div'); info.className='endinfo';
-    info.innerHTML = '<div class="endtag">КОНЦОВКА</div><div class="endcount">Открыто концовок: '+endsSeen.length+' из '+TOTAL_ENDS+'</div>';
-    box.appendChild(info);
-    const b=document.createElement('button'); b.className='choice primary'; b.textContent='Начать заново'; b.style.animationDelay=(choiceBase+0.5)+'s';
-    b.onclick=()=>{ startGame(); }; box.appendChild(b);
-    const b2=document.createElement('button'); b2.className='choice'; b2.textContent='В главное меню'; b2.style.animationDelay=(choiceBase+0.6)+'s';
-    b2.onclick=showMenu; box.appendChild(b2);
+    buildEnding(box, sc, choiceBase);
   } else {
     box.className='choices';
     visible(sc,s).forEach((c,i)=>{
@@ -1188,8 +1802,8 @@ function render(){
 
 function pick(i){
   SND.sfx('click');
-  const before = s.scene;
   choose(s,i);
+  if(s.scene==='__menu'){ s.scene='c2_pick'; showMenu(); return; }
   render();
 }
 
@@ -1200,10 +1814,15 @@ document.addEventListener('keydown',e=>{
 });
 
 function startGame(){
-  s = newState(); prev=null; lastScene=null; showGame(); render();
+  hideScreen(); s = newState(1); prev=null; lastScene=null; showGame(); render();
+}
+function startChapter2(endId){
+  hideScreen(); s = newState(2); prev=null; lastScene=null;
+  if(endId){ applyMemory(s,endId); s.scene='c2_intro'; } else s.scene='c2_pick';
+  showGame(); render();
 }
 function continueGame(){
-  try{ s = JSON.parse(lsGet(SAVE_KEY)); }catch(e){ s=null; }
+  try{ s = fixState(JSON.parse(lsGet(SAVE_KEY))); }catch(e){ s=null; }
   if(!s || !S[s.scene]){ startGame(); return; }
   prev=null; lastScene=null; showGame(); render();
 }
@@ -1213,11 +1832,25 @@ function showMenu(){
   $('game').style.display='none'; $('menu').style.display='flex'; document.body.className='';
   $('contbtn').style.display = lsGet(SAVE_KEY) ? 'block' : 'none';
   menuIntro();
-  $('endsline').textContent = endsSeen.length ? 'Открыто концовок: '+endsSeen.length+' из '+TOTAL_ENDS : 'Концовок: '+TOTAL_ENDS+'. Найди их все.';
+  const mm=meta(), open=chapter2Open();
+  $('c2btn').classList.toggle('locked',!open);
+  $('c2btn').textContent = open ? 'ГЛАВА II · ГЛУБИНА' : 'ГЛАВА II · ЗАКРЫТО';
+  $('endsline').textContent = mm.ends.length ? 'Концовок: '+mm.ends.length+' из '+TOTAL_ENDS+' · достижений: '+mm.ach.length+' из '+ACH.length : 'Концовок: '+TOTAL_ENDS+'. Найди их все.';
 }
 $('newbtn').onclick = ()=>{ lsDel(SAVE_KEY); startGame(); };
 $('contbtn').onclick = continueGame;
 $('menubtn').onclick = ()=>{ save(); showMenu(); };
+$('c2btn').onclick = ()=>{
+  if(!chapter2Open()){ $('endsline').textContent='Сначала пройди главу I до любой концовки.'; SND.sfx('dmg'); return; }
+  lsDel(SAVE_KEY); startChapter2(null);
+};
+$('achbtn').onclick = ()=>showAchievements();
+$('statbtn').onclick = ()=>showStats();
+$('screenback').onclick = hideScreen;
+let mapOpen = innerWidth>=600;
+function syncMap(){ $('mapwrap').classList.toggle('closed',!mapOpen); $('mapbtn').textContent = mapOpen?'СВЕРНУТЬ':'РАЗВЕРНУТЬ'; }
+$('mapbtn').onclick = ()=>{ mapOpen=!mapOpen; syncMap(); };
+syncMap();
 
 
 /* ——— Живая звуковая волна («Хор») ——— */
@@ -1356,10 +1989,114 @@ function toggleSound(){ SND.setEnabled(!SND.isOn()); SND.setState(inGameNow()?s:
 ['pointerdown','keydown'].forEach(ev=>addEventListener(ev,()=>{ if(SND.isOn() && !SND.hasCtx()) SND.start(inGameNow()?s:null); else if(SND.isOn()) SND.start(inGameNow()?s:null); },true));
 $('sndbtn').onclick = toggleSound;
 $('sndbtn2').onclick = toggleSound;
+document.addEventListener('keydown',e=>{ if(['k','K','л','Л'].includes(e.key) && !e.ctrlKey && !e.metaKey && $('game').style.display==='block'){ mapOpen=!mapOpen; syncMap(); } });
 document.addEventListener('keydown',e=>{ if((e.key==='m'||e.key==='M'||e.key==='ь'||e.key==='Ь') && !e.ctrlKey && !e.metaKey) toggleSound(); });
 syncSnd();
 
 showMenu();
+
+
+/* ——— Экран концовки, достижения, статистика ——— */
+function showToast(a){
+  const t=document.createElement('div'); t.className='toast';
+  t.innerHTML='<div class="toasticon">★</div><div><div class="toasttag">ДОСТИЖЕНИЕ</div><div class="toasttitle"></div><div class="toastdesc"></div></div>';
+  t.querySelector('.toasttitle').textContent=a.t; t.querySelector('.toastdesc').textContent=a.d;
+  $('toasts').appendChild(t); SND.sfx('achv');
+  setTimeout(()=>t.classList.add('out'),4600); setTimeout(()=>t.remove(),5200);
+}
+function endStatText(id){
+  const e=s && s._end;
+  if(!e || e.stats===undefined) return 'Считаю, сколько игроков пришло к такой же концовке…';
+  if(e.stats===false){
+    const n=meta().counts[id]||1;
+    return 'Ты получил эту концовку раз: '+n+'. Общая статистика здесь недоступна. Открой игру на сайте, чтобы увидеть, сколько игроков пришло к тому же.';
+  }
+  const total=statTotal(e.stats), n=e.stats[id]||0, pct= total ? Math.round(n/total*100) : 0;
+  return 'Эту концовку получили '+(pct<1&&n>0?'меньше 1':pct)+'% игроков ('+n+' из '+total+').';
+}
+function paintEndStat(id){
+  const el=$('endstat'); if(!el || !s || s.scene!==id || !s._end) return;
+  el.textContent=endStatText(id);
+}
+function buildEnding(box, sc, base){
+  const id=s.scene;
+  if(!s._end){
+    const r=recordEnding(s,id);
+    s._end={ unlocked:r.unlocked.map(a=>a.id), isNew:r.isNew };
+    r.unlocked.forEach((a,i)=>setTimeout(()=>showToast(a), 1300+i*1200));
+    sendEnding(id).then(()=>fetchStats()).then(st=>{ s._end.stats = st || false; paintEndStat(id); });
+  }
+  lsDel(SAVE_KEY);
+  const m=meta();
+  box.className='choices endbox kind-'+sc.kind;
+  const info=document.createElement('div'); info.className='endinfo';
+  info.innerHTML='<div class="endtag">КОНЦОВКА</div><div class="endcount"></div><div class="endstat" id="endstat"></div>';
+  info.querySelector('.endcount').textContent='Открыто концовок: '+m.ends.length+' из '+TOTAL_ENDS+(s._end.isNew?' · новая':'');
+  box.appendChild(info);
+  if(s._end.unlocked.length){
+    const w=document.createElement('div'); w.className='endach';
+    w.innerHTML='<div class="endachh">НОВЫЕ ДОСТИЖЕНИЯ</div>';
+    s._end.unlocked.forEach(aid=>{
+      const a=ACH.find(x=>x.id===aid); const row=document.createElement('div'); row.className='achrow';
+      row.innerHTML='<span class="achstar">★</span><b></b><span></span>'; row.children[1].textContent=a.t; row.children[2].textContent=a.d; w.appendChild(row);
+    });
+    box.appendChild(w);
+  }
+  const btns=[];
+  if(s.chapter===1) btns.push(['Продолжить: Глава II · Глубина', ()=>startChapter2(id), true]);
+  else btns.push(['Сыграть главу II ещё раз', ()=>startChapter2(null), true]);
+  btns.push(['Начать главу I заново', ()=>startGame()]);
+  btns.push(['Статистика концовок', ()=>showStats()]);
+  btns.push(['В главное меню', ()=>showMenu()]);
+  btns.forEach((x,i)=>{
+    const b=document.createElement('button'); b.className='choice'+(x[2]?' primary':''); b.textContent=x[0];
+    b.style.animationDelay=(base+0.4+i*0.08)+'s'; b.onclick=x[1]; box.appendChild(b);
+  });
+  paintEndStat(id);
+}
+
+function showScreen(title, html){
+  $('screentitle').textContent=title; $('screenbody').innerHTML=html;
+  $('screen').style.display='block'; $('screen').scrollTop=0; document.body.classList.add('noscroll');
+}
+function hideScreen(){ $('screen').style.display='none'; document.body.classList.remove('noscroll'); }
+function esc(t){ return String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+function showAchievements(){
+  const m=meta();
+  let h='<div class="sumline">Открыто: <b>'+m.ach.length+' из '+ACH.length+'</b></div><div class="achgrid">';
+  ACH.forEach(a=>{
+    const on=m.ach.includes(a.id);
+    h+='<div class="achcard'+(on?' on':'')+'"><div class="achico">'+(on?'★':'◇')+'</div><div><div class="acht">'+esc(a.t)+'</div><div class="achd">'+esc(a.d)+'</div></div></div>';
+  });
+  showScreen('Достижения', h+'</div>');
+}
+function statsRows(st){
+  const m=meta(), total=st?statTotal(st):0;
+  let h='';
+  [1,2].forEach(ch=>{
+    h+='<div class="statch">ГЛАВА '+(ch===1?'I':'II')+'</div>';
+    ALL_ENDS().filter(id=>chapterOfEnd(id)===ch).forEach(id=>{
+      const mine=m.ends.includes(id), n=st?(st[id]||0):0, pct= total ? n/total*100 : 0;
+      h+='<div class="statrow'+(mine?' mine':'')+'"><div class="statname">'+(mine?esc(S[id].t):'???')+(mine?' <span class="statmine">твоя</span>':'')+'</div>'
+       +'<div class="statbar"><i style="width:'+Math.min(100,pct).toFixed(1)+'%"></i></div>'
+       +'<div class="statpct">'+(st ? (pct>0&&pct<1?'<1':Math.round(pct))+'%' : '–')+'</div></div>';
+    });
+  });
+  return h;
+}
+function showStats(){
+  showScreen('Статистика концовок',
+    '<div class="sumline" id="sstat">Загружаю общую статистику…</div><div id="sbars">'+statsRows(null)+'</div>'
+   +'<div class="privacy">Отправляется только название концовки: без имени, без данных об устройстве. Неоткрытые концовки скрыты, но их доля игроков видна.</div>');
+  fetchStats().then(st=>{
+    if(!$('sstat')) return;
+    if(!st){ $('sstat').textContent='Общая статистика недоступна: возможно, нет сети или игра открыта не на сайте. Показаны только твои концовки.'; return; }
+    const total=statTotal(st);
+    $('sstat').innerHTML='Всего прохождений: <b>'+total+'</b>';
+    $('sbars').innerHTML=statsRows(st);
+  });
+}
 </script>
 </body>
 </html>
