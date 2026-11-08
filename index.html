@@ -225,9 +225,9 @@ body.lowhp .ecg polyline{animation-duration:.6s}
 #menu{overflow:hidden}
 .hero{position:relative;display:flex;align-items:center;justify-content:center;width:100%}
 .rings{position:absolute;left:50%;top:50%;width:0;height:0;pointer-events:none}
-.rings span{position:absolute;left:-50px;top:-50px;width:100px;height:100px;border:1px solid rgba(127,227,208,.55);border-radius:50%;opacity:0;animation:ring 2.8s ease-out infinite}
-.rings span:nth-child(2){animation-delay:.93s}.rings span:nth-child(3){animation-delay:1.86s}
-@keyframes ring{0%{transform:scale(.3);opacity:.8}100%{transform:scale(9);opacity:0}}
+.rings span{position:absolute;left:-50px;top:-50px;width:100px;height:100px;border:1px solid rgba(127,227,208,.55);border-radius:50%;opacity:0;animation:ring 8.5s ease-out infinite}
+.rings span:nth-child(2){animation-delay:.4s}.rings span:nth-child(3){animation-delay:.8s}
+@keyframes ring{0%{transform:scale(.3);opacity:.8}30%{transform:scale(9);opacity:0}100%{transform:scale(9);opacity:0}}
 @keyframes titleFlick{0%,90%,94%,100%{opacity:1}92%{opacity:.45}96%{opacity:.7}}
 #menu h1.gl{animation-play-state:running}
 #menu #newbtn{animation:choiceIn .45s ease-out .25s both,btnPulse 1.8s ease-in-out .8s infinite}
