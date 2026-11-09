@@ -350,6 +350,9 @@ body.noscroll{overflow:hidden}
   <button class="btn" id="c3btn">ГЛАВА III · ЗАКРЫТО</button>
   <button class="btn" id="c4btn">ГЛАВА IV · ЗАКРЫТО</button>
   <button class="btn" id="c5btn">ГЛАВА V · ЗАКРЫТО</button>
+  <button class="btn" id="c6btn">ГЛАВА VI · ЗАКРЫТО</button>
+  <button class="btn" id="c7btn">ГЛАВА VII · ЗАКРЫТО</button>
+  <button class="btn" id="c8btn">ГЛАВА VIII · ЗАКРЫТО</button>
   <div class="menurow"><button class="btn sec" id="achbtn">ДОСТИЖЕНИЯ</button><button class="btn sec" id="statbtn">СТАТИСТИКА</button></div>
   <button class="btn sec" id="sndbtn">ЗВУК: ВКЛ</button>
   <div class="sub" id="endsline"></div>
@@ -1133,6 +1136,7 @@ const G = s => s.f.g;
 S.__menu = { t:'', safe:true, text:'', ch:[] };
 S.__ch4 = { t:'', safe:true, text:'', ch:[] };
 S.__ch5 = { t:'', safe:true, text:'', ch:[] };
+[6,7,8].forEach(n=>{ S['__ch'+n] = { t:'', safe:true, text:'', ch:[] }; });
 
 S.c2_pick = { t:'Глава II · Память', safe:true,
   text:`Прошло девятнадцать суток.
@@ -1677,6 +1681,9 @@ function chapter2Open(){ return Object.keys(meta().runs1).some(id=>S[id]); }
 function chapter3Open(){ return C2_CONT.some(id=>(meta().runs2||{})[id]); }
 function chapter4Open(){ return !!((meta().runs3||{}).done); }
 function chapter5Open(){ return !!((meta().runs4||{}).done); }
+const CHDEF = {};
+const ROMAN = {6:'VI',7:'VII',8:'VIII'};
+function chapterNOpen(n){ return !!((meta()['runs'+(n-1)]||{}).done); }
 function chapter3Pick(){ return C2_CONT.find(id=>(meta().runs2||{})[id]) || null; }
 
 /* ——— общая статистика (Supabase) ——— */
@@ -1719,6 +1726,7 @@ const C2_DEPTH = {
 const C2_LABELS = ['«Кормчий»','Выход','Станция','Шахта','Тоннель','Зал отзвуков','Мост','Сердце'];
 
 function nodeOf(s){
+  if(s.chapter>=6 && CHDEF[s.chapter]) return CHDEF[s.chapter].node[s.scene] || null;
   if(s.chapter===5) return (typeof NODE5!=='undefined' && NODE5[s.scene]) || null;
   if(s.chapter===4) return (typeof NODE4!=='undefined' && NODE4[s.scene]) || null;
   if(s.chapter>=3) return (typeof NODE3!=='undefined' && NODE3[s.scene]) || null;
@@ -1742,6 +1750,7 @@ function roomPos(r){ const t=r.a*Math.PI/180; return { x:CX+RX*Math.cos(t), y:CY
 function renderMap(s){
   const vis=s.visited||[], cur=nodeOf(s), has2=id=>vis.includes(id);
   const ringKnown = has2('ring');
+  if(s.chapter>=6 && CHDEF[s.chapter]) return CHDEF[s.chapter].map(s,vis,cur);
   if(s.chapter===5 && typeof CH_MAP5==='function') return CH_MAP5(s,vis,cur);
   if(s.chapter===4 && typeof CH_MAP4==='function') return CH_MAP4(s,vis,cur);
   if(s.chapter===3 && typeof CH_MAP==='function') return CH_MAP(s,vis,cur);
@@ -2155,7 +2164,10 @@ const CH_INFO = { 1:{label:'ЭХО-7 · ГЛАВА I', clock:'ПЕРЕГРУЗК
                   2:{label:'ЭХО-7 · ГЛАВА II', clock:'ОБВАЛ ШАХТЫ', map:'ГЛУБИНА'},
                   3:{label:'ЭХО-6 · ГЛАВА III', clock:'ЛЁД', map:'ЭХО-6'},
                   4:{label:'ЭХО-5 · ГЛАВА IV', clock:'ВОДА', map:'ЭХО-5'},
-                  5:{label:'ЭХО-4 · ГЛАВА V', clock:'ТИШИНА', map:'ЭХО-4'} };
+                  5:{label:'ЭХО-4 · ГЛАВА V', clock:'ТИШИНА', map:'ЭХО-4'},
+                  6:{label:'ЭХО-3 И ЭХО-2 · ГЛАВА VI', clock:'СОГЛАСИЕ', map:'ЭХО-3 / ЭХО-2'},
+                  7:{label:'ЭХО-1 · ГЛАВА VII', clock:'ГОЛОС', map:'ЭХО-1'},
+                  8:{label:'ШАХТА · ГЛАВА VIII', clock:'НОТА', map:'ШАХТА'} };
 const TOTAL_ENDS = Object.values(S).filter(x=>x.end).length;
 let s = null;
 const $ = id => document.getElementById(id);
@@ -2291,6 +2303,7 @@ function renderHud(){
   if(s.chapter===3 && typeof NOTES3==='function') notes += NOTES3(s);
   if(s.chapter===4 && typeof NOTES4==='function') notes += NOTES4(s);
   if(s.chapter===5 && typeof NOTES5==='function') notes += NOTES5(s);
+  if(s.chapter>=6 && CHDEF[s.chapter]) notes += CHDEF[s.chapter].notes(s);
   $('notes').innerHTML = notes;
   if(newItem) SND.sfx('pickup');
   prev = { hp:s.hp, san:s.san, o2:s.o2, counts:counts, codes:nk, clock:s.clock };
@@ -2352,6 +2365,7 @@ function pick(i){
   choose(s,i);
   if(s.scene===before && s.scene!=='__menu' && s.hp>=hp0 && s.san>=san0) SND.sfx('look', s.chapter);
   if(s.scene==='__menu'){ s.scene='c2_pick'; showMenu(); return; }
+  { const mm=/^__ch(\d)$/.exec(s.scene); if(mm && +mm[1]>=6){ s.scene='c'+(mm[1]-1)+'_done'; startChapterN(+mm[1]); return; } }
   if(s.scene==='__ch5'){ s.scene='c4_done'; startChapter5(); return; }
   if(s.scene==='__ch4'){ s.scene='c3_done'; startChapter4(); return; }
   render();
@@ -2366,7 +2380,7 @@ document.addEventListener('keydown',e=>{
 function startGame(){
   hideScreen(); s = newState(1); prev=null; lastScene=null; showGame(); render();
 }
-const CH_FILES = { 5:['chapters/ch5a.js','chapters/ch5b.js','chapters/ch5c.js','chapters/ch5d.js','chapters/ch5e.js','chapters/ch5f.js','chapters/ch5g.js'], 4:['chapters/ch4a.js','chapters/ch4b.js','chapters/ch4c.js','chapters/ch4d.js','chapters/ch4e.js','chapters/ch4f.js'], 3:['chapters/ch3a.js','chapters/ch3b.js','chapters/ch3c.js','chapters/ch3d.js','chapters/ch3e.js','chapters/ch3f.js','chapters/ch3g.js','chapters/ch3h.js','chapters/ch3i.js','chapters/ch3j.js','chapters/ch3k.js'] };
+const CH_FILES = { 6:['chapters/ch6a.js','chapters/ch6b.js','chapters/ch6c.js','chapters/ch6d.js','chapters/ch6e.js','chapters/ch6f.js','chapters/ch6g.js'], 5:['chapters/ch5a.js','chapters/ch5b.js','chapters/ch5c.js','chapters/ch5d.js','chapters/ch5e.js','chapters/ch5f.js','chapters/ch5g.js'], 4:['chapters/ch4a.js','chapters/ch4b.js','chapters/ch4c.js','chapters/ch4d.js','chapters/ch4e.js','chapters/ch4f.js'], 3:['chapters/ch3a.js','chapters/ch3b.js','chapters/ch3c.js','chapters/ch3d.js','chapters/ch3e.js','chapters/ch3f.js','chapters/ch3g.js','chapters/ch3h.js','chapters/ch3i.js','chapters/ch3j.js','chapters/ch3k.js'] };
 function ensureChapter(n,cb){
   if(S['c'+n+'_start']){ cb(); return; }
   if(n>3 && !S['c'+(n-1)+'_start']){ ensureChapter(n-1,()=>ensureChapter(n,cb)); return; }
@@ -2419,6 +2433,18 @@ function startChapter5(){
     showGame(); render();
   });
 }
+function startChapterN(n){
+  const r=(meta()['runs'+(n-1)]||{}).done; if(!r) return;
+  ensureChapter(n,()=>{
+    hideScreen(); s=newState(n); prev=null; lastScene=null;
+    s.f=Object.assign({},r.f||{}); s['f']['c'+(n-1)+'end']=1; delete s.f['c'+(n-1)+'_recorded']; delete s.f.clocklab;
+    s.stat=Object.assign({kills:0,loud:0,hurt:0},r.stat||{});
+    s.hp=Math.max(8,Math.min(10,r.hp||10)); s.san=Math.max(7,Math.min(10,(r.san||10)+2));
+    s.scene='c'+n+'_start';
+    lsSet(chkKey(n),JSON.stringify(s));
+    showGame(); render();
+  });
+}
 function chkKey(n){ return 'echo7_chk_'+(n||3); }
 function retryFromCheckpoint(n){
   let c=null; try{ c=JSON.parse(lsGet(chkKey(n))); }catch(e){}
@@ -2452,6 +2478,7 @@ function showMenu(){
   $('c2btn').classList.toggle('locked',!open);
   $('c2btn').textContent = open ? 'ГЛАВА II · ГЛУБИНА' : 'ГЛАВА II · ЗАКРЫТО';
   const open3=chapter3Open(); $('c3btn').classList.toggle('locked',!open3); $('c3btn').textContent = open3 ? 'ГЛАВА III · ЭХО-6' : 'ГЛАВА III · ЗАКРЫТО';
+  [[6,'ЭХО-3 И 2'],[7,'ЭХО-1'],[8,'ШАХТА']].forEach(a=>{ const o=chapterNOpen(a[0]) && !!CH_FILES[a[0]]; $('c'+a[0]+'btn').classList.toggle('locked',!o); $('c'+a[0]+'btn').textContent='ГЛАВА '+ROMAN[a[0]]+' · '+(o?a[1]:'ЗАКРЫТО'); });
   const open5=chapter5Open(); $('c5btn').classList.toggle('locked',!open5); $('c5btn').textContent = open5 ? 'ГЛАВА V · ЭХО-4' : 'ГЛАВА V · ЗАКРЫТО';
   const open4=chapter4Open(); $('c4btn').classList.toggle('locked',!open4); $('c4btn').textContent = open4 ? 'ГЛАВА IV · ЭХО-5' : 'ГЛАВА IV · ЗАКРЫТО';
   $('endsline').textContent = mm.ends.length ? 'Концовок: '+mm.ends.length+' из '+TOTAL_ENDS+' · достижений: '+mm.ach.length+' из '+ACH.length : 'Концовок: '+TOTAL_ENDS+'. Найди их все.';
@@ -2475,6 +2502,10 @@ $('c5btn').onclick = ()=>{
   if(!chapter5Open()){ $('endsline').textContent='Сначала пройди главу IV до конца: подними язык Колокола с Эхо-5.'; SND.sfx('dmg'); return; }
   lsDel(SAVE_KEY); startChapter5();
 };
+[6,7,8].forEach(n=>{ $('c'+n+'btn').onclick=()=>{
+  if(!chapterNOpen(n) || !CH_FILES[n]){ $('endsline').textContent='Сначала пройди предыдущую главу до конца.'; SND.sfx('dmg'); return; }
+  lsDel(SAVE_KEY); startChapterN(n);
+}; });
 $('achbtn').onclick = ()=>showAchievements();
 $('statbtn').onclick = ()=>showStats();
 $('screenback').onclick = hideScreen;
@@ -2656,7 +2687,8 @@ function buildCampaignFail(box, sc, base){
   const btns=[];
   const chn=s.chapter, c2e=s.f.c2end;
   if(lsGet(chkKey(chn))) btns.push(['С контрольной точки', ()=>retryFromCheckpoint(chn), true]);
-  if(chn===5) btns.push(['Главу V с начала', ()=>startChapter5()]);
+  if(chn>=6) btns.push(['Главу '+ROMAN[chn]+' с начала', ()=>startChapterN(chn)]);
+  else if(chn===5) btns.push(['Главу V с начала', ()=>startChapter5()]);
   else if(chn===4) btns.push(['Главу IV с начала', ()=>startChapter4()]);
   else btns.push(['Главу III с начала', ()=>startChapter3(c2e)]);
   btns.push(['В главное меню', ()=>showMenu()]);
