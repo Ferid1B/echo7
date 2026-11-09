@@ -399,7 +399,7 @@ function give(s,i){ if(STACK.has(i) || !has(s,i)){ s.inv.push(i); sys(s,'Пол�
 function take(s,i){ const k=s.inv.indexOf(i); if(k>=0) s.inv.splice(k,1); }
 function hurt(s,n){ s.hp=Math.max(0,s.hp-n); s.stat.hurt+=n; sys(s,'Здоровье −'+n); }
 function heal(s,n){ s.hp=Math.min(10,s.hp+n); sys(s,'Здоровье +'+n); }
-function fear(s,n){ s.san=Math.max(0,s.san-n); sys(s,'Рассудок −'+n); }
+function fear(s,n){ if(s.f.plugs>0 && n>0){ s.f.plugs--; n=Math.max(0,n-1); if(n===0){ sys(s,'Беруши глушат звук.'); return; } } s.san=Math.max(0,s.san-n); sys(s,'Рассудок −'+n); }
 function calm(s,n){ s.san=Math.min(10,s.san+n); sys(s,'Рассудок +'+n); }
 function air(s,n){ s.o2=Math.min(100,s.o2+n); sys(s,'Кислород +'+n+'%'); }
 function loud(s,n){ s.noise+=(n||1); s.stat.loud+=(n||1); }
@@ -1853,8 +1853,10 @@ function choose(s,i){
   else { const d=settle(s); if(d) s.scene=d; }
   return true;
 }
+const ITEM_USE = {};   // применяемые предметы из расширений: ключ → функция(s)
 function useItem(s,item){
   const k=s.inv.indexOf(item); if(k<0) return;
+  if(ITEM_USE[item]){ s.inv.splice(k,1); ITEM_USE[item](s); return; }
   if(item==='med'){ s.inv.splice(k,1); heal(s,4); }
   else if(item==='sedative'){ s.inv.splice(k,1); calm(s,3); }
   else if(item==='serum'){ s.inv.splice(k,1); s.f.heard=false; calm(s,3); sys(s,'Сыворотка подействовала: эхо в голове стихает'); }
@@ -2243,7 +2245,7 @@ function renderHud(){
   if(!keys.length) inv.innerHTML = '<span class="muted">пусто</span>';
   let newItem=false;
   keys.forEach(k=>{
-    const usable = ['med','sedative','serum'].includes(k);
+    const usable = ['med','sedative','serum'].includes(k) || !!ITEM_USE[k];
     const el = document.createElement(usable?'button':'span');
     const isNew = P && (!(k in P.counts) || counts[k]>P.counts[k]);
     if(isNew) newItem=true;
@@ -2272,6 +2274,7 @@ function renderHud(){
     if(s.f.m_pacifist) notes += '<div class="note">Поющие, возможно, помнят, что Савин никого не тронул.</div>';
     if(s.f.m_killer) notes += '<div class="note">Поющие помнят насилие: на станции будет шумнее.</div>';
   }
+  if(s.chapter===1 && typeof NOTES1==='function') notes += NOTES1(s);
   if(s.chapter>=3 && typeof NOTES3==='function') notes += NOTES3(s);
   $('notes').innerHTML = notes;
   if(newItem) SND.sfx('pickup');
@@ -2688,6 +2691,7 @@ function showStats(){
   });
 }
 </script>
+<script src="chapters/ch1x.js"></script>
 <script>
 if('serviceWorker' in navigator && location.protocol.startsWith('http')){ window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{})); }
 </script>
