@@ -348,6 +348,7 @@ body.noscroll{overflow:hidden}
   <button class="btn" id="contbtn" style="display:none">ПРОДОЛЖИТЬ</button>
   <button class="btn" id="c2btn">ГЛАВА II · ЗАКРЫТО</button>
   <button class="btn" id="c3btn">ГЛАВА III · ЗАКРЫТО</button>
+  <button class="btn" id="c4btn">ГЛАВА IV · ЗАКРЫТО</button>
   <div class="menurow"><button class="btn sec" id="achbtn">ДОСТИЖЕНИЯ</button><button class="btn sec" id="statbtn">СТАТИСТИКА</button></div>
   <button class="btn sec" id="sndbtn">ЗВУК: ВКЛ</button>
   <div class="sub" id="endsline"></div>
@@ -1129,6 +1130,7 @@ function applyMemory(s,id){
 const G = s => s.f.g;
 
 S.__menu = { t:'', safe:true, text:'', ch:[] };
+S.__ch4 = { t:'', safe:true, text:'', ch:[] };
 
 S.c2_pick = { t:'Глава II · Память', safe:true,
   text:`Прошло девятнадцать суток.
@@ -1671,6 +1673,7 @@ function recordEnding(s,id){
 }
 function chapter2Open(){ return Object.keys(meta().runs1).some(id=>S[id]); }
 function chapter3Open(){ return C2_CONT.some(id=>(meta().runs2||{})[id]); }
+function chapter4Open(){ return !!((meta().runs3||{}).done); }
 function chapter3Pick(){ return C2_CONT.find(id=>(meta().runs2||{})[id]) || null; }
 
 /* ——— общая статистика (Supabase) ——— */
@@ -1713,6 +1716,7 @@ const C2_DEPTH = {
 const C2_LABELS = ['«Кормчий»','Выход','Станция','Шахта','Тоннель','Зал отзвуков','Мост','Сердце'];
 
 function nodeOf(s){
+  if(s.chapter===4) return (typeof NODE4!=='undefined' && NODE4[s.scene]) || null;
   if(s.chapter>=3) return (typeof NODE3!=='undefined' && NODE3[s.scene]) || null;
   if(s.chapter===2){ const d=C2_DEPTH[s.scene]; return d===undefined ? null : 'd'+d; }
   return SCENE_NODE[s.scene] || null;
@@ -1734,7 +1738,8 @@ function roomPos(r){ const t=r.a*Math.PI/180; return { x:CX+RX*Math.cos(t), y:CY
 function renderMap(s){
   const vis=s.visited||[], cur=nodeOf(s), has2=id=>vis.includes(id);
   const ringKnown = has2('ring');
-  if(s.chapter>=3 && typeof CH_MAP==='function') return CH_MAP(s,vis,cur);
+  if(s.chapter===4 && typeof CH_MAP4==='function') return CH_MAP4(s,vis,cur);
+  if(s.chapter===3 && typeof CH_MAP==='function') return CH_MAP(s,vis,cur);
   if(s.chapter===2) return renderDepth(s,vis,cur);
   const pos={}; ROOMS.forEach(r=>pos[r.id]=roomPos(r));
   // дочерние узлы машинного отделения
@@ -2143,7 +2148,8 @@ const SND = (function(){
 const SAVE_KEY='echo7_save_v1';
 const CH_INFO = { 1:{label:'ЭХО-7 · ГЛАВА I', clock:'ПЕРЕГРУЗКА РЕАКТОРА', map:'КАРТА СТАНЦИИ'},
                   2:{label:'ЭХО-7 · ГЛАВА II', clock:'ОБВАЛ ШАХТЫ', map:'ГЛУБИНА'},
-                  3:{label:'ЭХО-6 · ГЛАВА III', clock:'ЛЁД', map:'ЭХО-6'} };
+                  3:{label:'ЭХО-6 · ГЛАВА III', clock:'ЛЁД', map:'ЭХО-6'},
+                  4:{label:'ЭХО-5 · ГЛАВА IV', clock:'ВОДА', map:'ЭХО-5'} };
 const TOTAL_ENDS = Object.values(S).filter(x=>x.end).length;
 let s = null;
 const $ = id => document.getElementById(id);
@@ -2276,7 +2282,8 @@ function renderHud(){
     if(s.f.m_killer) notes += '<div class="note">Поющие помнят насилие: на станции будет шумнее.</div>';
   }
   if(s.chapter===1 && typeof NOTES1==='function') notes += NOTES1(s);
-  if(s.chapter>=3 && typeof NOTES3==='function') notes += NOTES3(s);
+  if(s.chapter===3 && typeof NOTES3==='function') notes += NOTES3(s);
+  if(s.chapter===4 && typeof NOTES4==='function') notes += NOTES4(s);
   $('notes').innerHTML = notes;
   if(newItem) SND.sfx('pickup');
   prev = { hp:s.hp, san:s.san, o2:s.o2, counts:counts, codes:nk, clock:s.clock };
@@ -2338,6 +2345,7 @@ function pick(i){
   choose(s,i);
   if(s.scene===before && s.scene!=='__menu' && s.hp>=hp0 && s.san>=san0) SND.sfx('look', s.chapter);
   if(s.scene==='__menu'){ s.scene='c2_pick'; showMenu(); return; }
+  if(s.scene==='__ch4'){ s.scene='c3_done'; startChapter4(); return; }
   render();
 }
 
@@ -2350,9 +2358,10 @@ document.addEventListener('keydown',e=>{
 function startGame(){
   hideScreen(); s = newState(1); prev=null; lastScene=null; showGame(); render();
 }
-const CH_FILES = { 3:['chapters/ch3a.js','chapters/ch3b.js','chapters/ch3c.js','chapters/ch3d.js','chapters/ch3e.js','chapters/ch3f.js','chapters/ch3g.js','chapters/ch3h.js','chapters/ch3i.js','chapters/ch3j.js','chapters/ch3k.js'] };
+const CH_FILES = { 4:['chapters/ch4a.js','chapters/ch4b.js','chapters/ch4c.js','chapters/ch4d.js','chapters/ch4e.js','chapters/ch4f.js'], 3:['chapters/ch3a.js','chapters/ch3b.js','chapters/ch3c.js','chapters/ch3d.js','chapters/ch3e.js','chapters/ch3f.js','chapters/ch3g.js','chapters/ch3h.js','chapters/ch3i.js','chapters/ch3j.js','chapters/ch3k.js'] };
 function ensureChapter(n,cb){
   if(S['c'+n+'_start']){ cb(); return; }
+  if(n>3 && !S['c'+(n-1)+'_start']){ ensureChapter(n-1,()=>ensureChapter(n,cb)); return; }
   const files=(CH_FILES[n]||[]).slice();
   const next=()=>{
     const f=files.shift();
@@ -2378,8 +2387,21 @@ function startChapter3(endId){
     showGame(); render();
   });
 }
-function retryFromCheckpoint(){
-  let c=null; try{ c=JSON.parse(lsGet('echo7_chk_3')); }catch(e){}
+function startChapter4(){
+  const r=(meta().runs3||{}).done; if(!r) return;
+  ensureChapter(4,()=>{
+    hideScreen(); s=newState(4); prev=null; lastScene=null;
+    s.f=Object.assign({},r.f||{}); s.f.c3end=1; delete s.f.c3_recorded;
+    s.stat=Object.assign({kills:0,loud:0,hurt:0},r.stat||{});
+    s.hp=Math.max(8,Math.min(10,r.hp||10)); s.san=Math.max(7,Math.min(10,(r.san||10)+2));
+    s.scene='c4_start';
+    lsSet('echo7_chk_4',JSON.stringify(s));
+    showGame(); render();
+  });
+}
+function chkKey(n){ return 'echo7_chk_'+(n||3); }
+function retryFromCheckpoint(n){
+  let c=null; try{ c=JSON.parse(lsGet(chkKey(n))); }catch(e){}
   if(!c){ showMenu(); return; }
   ensureChapter(c.chapter||3,()=>{
     hideScreen(); s=fixState(c); s.msgs=[]; s.hp=Math.max(s.hp,6); s.san=Math.max(s.san,6); s.o2=Math.max(s.o2,40);
@@ -2388,7 +2410,7 @@ function retryFromCheckpoint(){
   });
 }
 function checkpoint(st){
-  const c=JSON.parse(JSON.stringify(st)); c.msgs=[]; lsSet('echo7_chk_3',JSON.stringify(c)); sys(st,'Контрольная точка.');
+  const c=JSON.parse(JSON.stringify(st)); c.msgs=[]; lsSet(chkKey(st.chapter),JSON.stringify(c)); sys(st,'Контрольная точка.');
 }
 function startChapter2(endId){
   hideScreen(); s = newState(2); prev=null; lastScene=null;
@@ -2410,6 +2432,7 @@ function showMenu(){
   $('c2btn').classList.toggle('locked',!open);
   $('c2btn').textContent = open ? 'ГЛАВА II · ГЛУБИНА' : 'ГЛАВА II · ЗАКРЫТО';
   const open3=chapter3Open(); $('c3btn').classList.toggle('locked',!open3); $('c3btn').textContent = open3 ? 'ГЛАВА III · ЭХО-6' : 'ГЛАВА III · ЗАКРЫТО';
+  const open4=chapter4Open(); $('c4btn').classList.toggle('locked',!open4); $('c4btn').textContent = open4 ? 'ГЛАВА IV · ЭХО-5' : 'ГЛАВА IV · ЗАКРЫТО';
   $('endsline').textContent = mm.ends.length ? 'Концовок: '+mm.ends.length+' из '+TOTAL_ENDS+' · достижений: '+mm.ach.length+' из '+ACH.length : 'Концовок: '+TOTAL_ENDS+'. Найди их все.';
 }
 $('newbtn').onclick = ()=>{ lsDel(SAVE_KEY); startGame(); };
@@ -2422,6 +2445,10 @@ $('c2btn').onclick = ()=>{
 $('c3btn').onclick = ()=>{
   if(!chapter3Open()){ $('endsline').textContent='Сначала пройди главу II, не погибнув: закрой шахту, ответь Хору, уйди или забери осколок.'; SND.sfx('dmg'); return; }
   lsDel(SAVE_KEY); startChapter3(null);
+};
+$('c4btn').onclick = ()=>{
+  if(!chapter4Open()){ $('endsline').textContent='Сначала пройди главу III до конца: подними «Кормчий» с Эхо-6.'; SND.sfx('dmg'); return; }
+  lsDel(SAVE_KEY); startChapter4();
 };
 $('achbtn').onclick = ()=>showAchievements();
 $('statbtn').onclick = ()=>showStats();
@@ -2602,8 +2629,10 @@ function buildCampaignFail(box, sc, base){
   const info=document.createElement('div'); info.className='endinfo';
   info.innerHTML='<div class="endtag">ГЛАВА НЕ ПРОЙДЕНА</div>'; box.appendChild(info);
   const btns=[];
-  if(lsGet('echo7_chk_3')) btns.push(['С контрольной точки', ()=>retryFromCheckpoint(), true]);
-  btns.push(['Главу III с начала', ()=>startChapter3(s.f.c2end)]);
+  const chn=s.chapter, c2e=s.f.c2end;
+  if(lsGet(chkKey(chn))) btns.push(['С контрольной точки', ()=>retryFromCheckpoint(chn), true]);
+  if(chn===4) btns.push(['Главу IV с начала', ()=>startChapter4()]);
+  else btns.push(['Главу III с начала', ()=>startChapter3(c2e)]);
   btns.push(['В главное меню', ()=>showMenu()]);
   btns.forEach((x,i)=>{ const b=document.createElement('button'); b.className='choice'+(x[2]?' primary':''); b.textContent=x[0];
     b.style.animationDelay=(base+0.4+i*0.08)+'s'; b.onclick=x[1]; box.appendChild(b); });
