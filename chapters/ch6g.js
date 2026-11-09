@@ -58,6 +58,6 @@ S.c6_voice = { t:'Голос Ковалёва', safe:true, cost:0,
     { t:'Отключить передатчик и лечь спать', go:'c6_start' }
   ] };
 
-addLook('c6_org',[ { t:'Достать ключ и остановить Орган', go:'c6_orgstop', if:s=>s.f.organ_key } ]);
-addLook('c6_sleep',[ { t:'Подойти к проснувшейся женщине', go:'c6_maria', if:s=>s.f.thread_cut || s.f.woke_all } ]);
-addLook('c6_start',[ { t:'Достать передатчик (он дрожит)', go:'c6_voice', if:s=>has(s,'bugdev') && !s.f.voice6 } ]);
+addLook4('c6_org',[ { t:'Достать ключ и остановить Орган', go:'c6_orgstop', if:s=>s.f.organ_key } ]);
+addLook4('c6_sleep',[ { t:'Подойти к проснувшейся женщине', go:'c6_maria', if:s=>s.f.thread_cut || s.f.woke_all } ]);
+addLook4('c6_start',[ { t:'Достать передатчик (он дрожит)', go:'c6_voice', if:s=>has(s,'bugdev') && !s.f.voice6 } ]);

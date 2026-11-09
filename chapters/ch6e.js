@@ -92,8 +92,8 @@ S.c6_night = { t:'Ночь на «Кормчем»', safe:true,
   ] };
 
 /* — навигация к новым сценам — */
-addLook('c6_dorm3',[ { t:'Зайти в лазарет к Седых', go:'c6_med3' } ]);
-addLook('c6_gate3',[ { t:'Заглянуть на кухню к Нилу', go:'c6_kit3' } ]);
-addLook('c6_sleep',[ { t:'Зайти в комнату Лидии', go:'c6_cell2' }, { t:'Пойти за мальчиком в боковой коридор', go:'c6_boy', if:s=>s.f.boy_seen || s.f.sleeper_seen } ]);
-addLook('c6_dark',[ { t:'Пойти на голос мальчика в боковой коридор', go:'c6_boy', if:s=>s.f.boy_seen } ]);
-addLook('c6_start',[ { t:'Ночной разговор', go:'c6_night', if:s=>s.f.briefed6 } ]);
+addLook4('c6_dorm3',[ { t:'Зайти в лазарет к Седых', go:'c6_med3' } ]);
+addLook4('c6_gate3',[ { t:'Заглянуть на кухню к Нилу', go:'c6_kit3' } ]);
+addLook4('c6_sleep',[ { t:'Зайти в комнату Лидии', go:'c6_cell2' }, { t:'Пойти за мальчиком в боковой коридор', go:'c6_boy', if:s=>s.f.boy_seen || s.f.sleeper_seen } ]);
+addLook4('c6_dark',[ { t:'Пойти на голос мальчика в боковой коридор', go:'c6_boy', if:s=>s.f.boy_seen } ]);
+addLook4('c6_start',[ { t:'Ночной разговор', go:'c6_night', if:s=>s.f.briefed6 } ]);

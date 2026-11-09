@@ -84,6 +84,6 @@ S.c6_read2 = { t:'Читальня Эхо-2', cost:2,
     { t:'Выйти', go:'c6_sleep' }
   ] };
 
-addLook('c6_start',[ { t:'Заглянуть в кладовую к Тоне', go:'c6_tonya' }, { t:'Зайти в кают-компанию', go:'c6_vika6' } ]);
-addLook('c6_gate3',[ { t:'Спуститься в подвал за кухней', go:'c6_cellar3', if:s=>s.f.nil_cable || s.f.tea_seen }, { t:'Пройти в оранжерею', go:'c6_garden3' } ]);
-addLook('c6_sleep',[ { t:'Зайти в читальню', go:'c6_read2' } ]);
+addLook4('c6_start',[ { t:'Заглянуть в кладовую к Тоне', go:'c6_tonya' }, { t:'Зайти в кают-компанию', go:'c6_vika6' } ]);
+addLook4('c6_gate3',[ { t:'Спуститься в подвал за кухней', go:'c6_cellar3', if:s=>s.f.nil_cable || s.f.tea_seen }, { t:'Пройти в оранжерею', go:'c6_garden3' } ]);
+addLook4('c6_sleep',[ { t:'Зайти в читальню', go:'c6_read2' } ]);
