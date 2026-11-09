@@ -2350,7 +2350,7 @@ document.addEventListener('keydown',e=>{
 function startGame(){
   hideScreen(); s = newState(1); prev=null; lastScene=null; showGame(); render();
 }
-const CH_FILES = { 3:['chapters/ch3a.js','chapters/ch3b.js','chapters/ch3c.js'] };
+const CH_FILES = { 3:['chapters/ch3a.js','chapters/ch3b.js','chapters/ch3c.js','chapters/ch3d.js','chapters/ch3e.js','chapters/ch3f.js','chapters/ch3g.js'] };
 function ensureChapter(n,cb){
   if(S['c'+n+'_start']){ cb(); return; }
   const files=(CH_FILES[n]||[]).slice();
