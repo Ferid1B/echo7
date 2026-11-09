@@ -347,6 +347,7 @@ body.noscroll{overflow:hidden}
   <button class="btn" id="newbtn">НОВАЯ ИГРА</button>
   <button class="btn" id="contbtn" style="display:none">ПРОДОЛЖИТЬ</button>
   <button class="btn" id="c2btn">ГЛАВА II · ЗАКРЫТО</button>
+  <button class="btn" id="c3btn">ГЛАВА III · ЗАКРЫТО</button>
   <div class="menurow"><button class="btn sec" id="achbtn">ДОСТИЖЕНИЯ</button><button class="btn sec" id="statbtn">СТАТИСТИКА</button></div>
   <button class="btn sec" id="sndbtn">ЗВУК: ВКЛ</button>
   <div class="sub" id="endsline"></div>
@@ -1616,10 +1617,10 @@ function meta(){
   let m=null;
   try{ m=JSON.parse(localStorage.getItem(META_KEY)||'null'); }catch(e){}
   if(!m || typeof m!=='object'){
-    m={ ends:[], counts:{}, ach:[], runs1:{}, c2done:0 };
+    m={ ends:[], counts:{}, ach:[], runs1:{}, runs2:{}, runs3:{}, c2done:0 };
     try{ const o=JSON.parse(localStorage.getItem(OLD_ENDS_KEY)||'[]'); if(Array.isArray(o)) m.ends=o.filter(x=>S[x]); }catch(e){}
   }
-  m.ends=m.ends||[]; m.counts=m.counts||{}; m.ach=m.ach||[]; m.runs1=m.runs1||{};
+  m.ends=m.ends||[]; m.counts=m.counts||{}; m.ach=m.ach||[]; m.runs1=m.runs1||{}; m.runs2=m.runs2||{}; m.runs3=m.runs3||{};
   _meta=m; return m;
 }
 function saveMeta(){ try{ localStorage.setItem(META_KEY, JSON.stringify(_meta)); }catch(e){} }
@@ -1648,15 +1649,16 @@ const ACH = [
   { id:'memory',   t:'Память',             d:'В главе II воспользоваться тем, что ты помнишь из главы I.', test:c=>c.s.chapter===2 && c.s.f.used_mem && c.surv },
   { id:'all',      t:'Полная партитура',   d:'Открыть все концовки обеих глав.',                  test:c=>c.m.ends.length>=ALL_ENDS().length }
 ];
-function ALL_ENDS(){ return Object.keys(S).filter(k=>S[k].end); }
-function chapterOfEnd(id){ return id.startsWith('c2_') ? 2 : 1; }
+function ALL_ENDS(){ return Object.keys(S).filter(k=>S[k].end && chapterOfEnd(k)<3); }
+function chapterOfEnd(id){ return id.startsWith('c2_') ? 2 : id.startsWith('c3_')||id.startsWith('cx_') ? 3 : 1; }
+const C2_CONT = ['c2_answer','c2_seal','c2_core','c2_flee'];
 
 function recordEnding(s,id){
   const m=meta(), isNew=!m.ends.includes(id);
   if(isNew) m.ends.push(id);
   m.counts[id]=(m.counts[id]||0)+1;
   if(s.chapter===1){ m.runs1[id]={ f:Object.assign({},s.f), stat:Object.assign({},s.stat), hp:s.hp, san:s.san }; }
-  else m.c2done=(m.c2done||0)+1;
+  else if(s.chapter===2){ m.c2done=(m.c2done||0)+1; m.runs2[id]={ f:Object.assign({},s.f), stat:Object.assign({},s.stat), hp:s.hp, san:s.san }; }
   const surv=SURVIVED.includes(id), unlocked=[];
   for(const a of ACH){
     if(m.ach.includes(a.id)) continue;
@@ -1667,6 +1669,8 @@ function recordEnding(s,id){
   return { isNew:isNew, unlocked:unlocked };
 }
 function chapter2Open(){ return Object.keys(meta().runs1).some(id=>S[id]); }
+function chapter3Open(){ return C2_CONT.some(id=>(meta().runs2||{})[id]); }
+function chapter3Pick(){ return C2_CONT.find(id=>(meta().runs2||{})[id]) || null; }
 
 /* ——— общая статистика (Supabase) ——— */
 function sbFetch(path, opts){
@@ -1708,6 +1712,7 @@ const C2_DEPTH = {
 const C2_LABELS = ['«Кормчий»','Выход','Станция','Шахта','Тоннель','Зал отзвуков','Мост','Сердце'];
 
 function nodeOf(s){
+  if(s.chapter>=3) return (typeof NODE3!=='undefined' && NODE3[s.scene]) || null;
   if(s.chapter===2){ const d=C2_DEPTH[s.scene]; return d===undefined ? null : 'd'+d; }
   return SCENE_NODE[s.scene] || null;
 }
@@ -1728,6 +1733,7 @@ function roomPos(r){ const t=r.a*Math.PI/180; return { x:CX+RX*Math.cos(t), y:CY
 function renderMap(s){
   const vis=s.visited||[], cur=nodeOf(s), has2=id=>vis.includes(id);
   const ringKnown = has2('ring');
+  if(s.chapter>=3 && typeof CH_MAP==='function') return CH_MAP(s,vis,cur);
   if(s.chapter===2) return renderDepth(s,vis,cur);
   const pos={}; ROOMS.forEach(r=>pos[r.id]=roomPos(r));
   // дочерние узлы машинного отделения
@@ -1798,11 +1804,11 @@ function markVisited(s){
 }
 function settle(s){
   if(S[s.scene].end) return null;
-  const c2 = s.chapter===2;
-  if(s.o2<=0) return c2 ? 'c2_o2' : 'end_o2';
-  if(s.hp<=0) return c2 ? 'c2_hp' : 'end_hp';
-  if(s.san<=0) return c2 ? 'c2_san' : 'end_san';
-  if(s.clock!==null && s.clock<=0) return c2 ? 'c2_late' : 'end_too_late';
+  const c2 = s.chapter===2, c3 = s.chapter>=3;
+  if(s.o2<=0) return c3 ? 'cx_o2' : c2 ? 'c2_o2' : 'end_o2';
+  if(s.hp<=0) return c3 ? 'cx_hp' : c2 ? 'c2_hp' : 'end_hp';
+  if(s.san<=0) return c3 ? 'cx_san' : c2 ? 'c2_san' : 'end_san';
+  if(s.clock!==null && s.clock<=0) return c3 ? 'cx_late' : c2 ? 'c2_late' : 'end_too_late';
   return null;
 }
 /* Баланс: где теряется здоровье и откуда берётся передышка */
@@ -2132,6 +2138,9 @@ const SND = (function(){
 })();
 /* ЭХО-7 — интерфейс */
 const SAVE_KEY='echo7_save_v1';
+const CH_INFO = { 1:{label:'ЭХО-7 · ГЛАВА I', clock:'ПЕРЕГРУЗКА РЕАКТОРА', map:'КАРТА СТАНЦИИ'},
+                  2:{label:'ЭХО-7 · ГЛАВА II', clock:'ОБВАЛ ШАХТЫ', map:'ГЛУБИНА'},
+                  3:{label:'ЭХО-6 · ГЛАВА III', clock:'ЛЁД', map:'ЭХО-6'} };
 const TOTAL_ENDS = Object.values(S).filter(x=>x.end).length;
 let s = null;
 const $ = id => document.getElementById(id);
@@ -2209,9 +2218,10 @@ function renderHud(){
   $('o2val').textContent = Math.round(o)+'%';
   $('clock').style.display = s.clock!==null ? 'flex' : 'none';
   if(s.clock!==null) $('clockval').textContent = Math.max(0,s.clock);
-  $('chlabel').textContent = s.chapter===2 ? 'ЭХО-7 · ГЛАВА II' : 'ЭХО-7 · ГЛАВА I';
-  $('clocklab').textContent = s.chapter===2 ? 'ОБВАЛ ШАХТЫ' : 'ПЕРЕГРУЗКА РЕАКТОРА';
-  $('maptitle').textContent = s.chapter===2 ? 'ГЛУБИНА' : 'КАРТА СТАНЦИИ';
+  const CHI = CH_INFO[s.chapter] || CH_INFO[1];
+  $('chlabel').textContent = CHI.label;
+  $('clocklab').textContent = (s.f.clocklab || CHI.clock);
+  $('maptitle').textContent = CHI.map;
   $('mapbox').innerHTML = renderMap(s);
   document.body.classList.toggle('lowhp', s.hp<=3);
   document.body.classList.toggle('lowsan', s.san<=3);
@@ -2245,23 +2255,24 @@ function renderHud(){
     inv.appendChild(el);
   });
   // заметки
-  const c2 = s.chapter===2;
+  const c2 = s.chapter>=2;
   const hasA = c2 ? s.f.m_codes : s.f.code_a, hasB = c2 ? s.f.m_codes : s.f.code_b, hasC = c2 ? s.f.m_codes : s.f.code_c;
   const a = hasA?CODE.a:'??', b = hasB?CODE.b:'??', c = hasC?CODE.c:'??';
   const nk = [s.f.code_a,s.f.code_b,s.f.code_c].filter(Boolean).length;
   const codeNew = P && nk>P.codes;
   let notes = '';
-  if(!c2 || s.f.m_codes) notes += '<div class="note'+(codeNew?' newn':'')+'"><b>Код реактора:</b> '+a+' · '+b+' · '+c+'</div>';
+  if(s.chapter<3 && (!c2 || s.f.m_codes)) notes += '<div class="note'+(codeNew?' newn':'')+'"><b>Код реактора:</b> '+a+' · '+b+' · '+c+'</div>';
   if(!c2){
     if(s.f.hint_cutter) notes += '<div class="note">Хор замолкает, если прогреть керн плазмой.</div>';
     if(s.f.lore_ice) notes += '<div class="note">Нота идёт из-под льда Мирры.</div>';
-  } else {
+  } else if(s.chapter===2) {
     if(s.f.m_ice) notes += '<div class="note">Ты знаешь, где буровая шахта.</div>';
     if(s.f.m_heard) notes += '<div class="note">Ты можешь ответить Хору его нотой.</div>';
     if(s.f.m_irina) notes += '<div class="note">У тебя схема «ответной ноты» Вахрушевой.</div>';
     if(s.f.m_pacifist) notes += '<div class="note">Поющие, возможно, помнят, что Савин никого не тронул.</div>';
     if(s.f.m_killer) notes += '<div class="note">Поющие помнят насилие: на станции будет шумнее.</div>';
   }
+  if(s.chapter>=3 && typeof NOTES3==='function') notes += NOTES3(s);
   $('notes').innerHTML = notes;
   if(newItem) SND.sfx('pickup');
   prev = { hp:s.hp, san:s.san, o2:s.o2, counts:counts, codes:nk, clock:s.clock };
@@ -2335,6 +2346,46 @@ document.addEventListener('keydown',e=>{
 function startGame(){
   hideScreen(); s = newState(1); prev=null; lastScene=null; showGame(); render();
 }
+const CH_FILES = { 3:['chapters/ch3a.js','chapters/ch3b.js','chapters/ch3c.js'] };
+function ensureChapter(n,cb){
+  if(S['c'+n+'_start']){ cb(); return; }
+  const files=(CH_FILES[n]||[]).slice();
+  const next=()=>{
+    const f=files.shift();
+    if(!f){ if(S['c'+n+'_start']) cb(); else { $('endsline').textContent='Не удалось загрузить главу.'; } return; }
+    const sc=document.createElement('script'); sc.src=f;
+    sc.onload=next;
+    sc.onerror=()=>{ showMenu(); $('endsline').textContent='Главу не удалось загрузить. При первом запуске нужен интернет.'; };
+    document.head.appendChild(sc);
+  };
+  next();
+}
+function startChapter3(endId){
+  endId = endId || chapter3Pick();
+  if(!endId) return;
+  ensureChapter(3,()=>{
+    hideScreen(); s=newState(3); prev=null; lastScene=null;
+    const r=(meta().runs2||{})[endId]||{};
+    s.f=Object.assign({},r.f||{}); s.f.c2end=endId;
+    s.stat=Object.assign({kills:0,loud:0,hurt:0},r.stat||{});
+    s.hp=Math.max(8,Math.min(10,r.hp||10)); s.san=Math.max(7,Math.min(10,(r.san||10)+3));
+    s.scene='c3_start';
+    lsSet('echo7_chk_3',JSON.stringify(s));
+    showGame(); render();
+  });
+}
+function retryFromCheckpoint(){
+  let c=null; try{ c=JSON.parse(lsGet('echo7_chk_3')); }catch(e){}
+  if(!c){ showMenu(); return; }
+  ensureChapter(c.chapter||3,()=>{
+    hideScreen(); s=fixState(c); s.msgs=[]; s.hp=Math.max(s.hp,6); s.san=Math.max(s.san,6); s.o2=Math.max(s.o2,40);
+    if(s.clock!==null) s.clock=Math.max(s.clock,6);
+    prev=null; lastScene=null; showGame(); render();
+  });
+}
+function checkpoint(st){
+  const c=JSON.parse(JSON.stringify(st)); c.msgs=[]; lsSet('echo7_chk_3',JSON.stringify(c)); sys(st,'Контрольная точка.');
+}
 function startChapter2(endId){
   hideScreen(); s = newState(2); prev=null; lastScene=null;
   if(endId){ applyMemory(s,endId); s.scene='c2_intro'; } else s.scene='c2_pick';
@@ -2342,8 +2393,8 @@ function startChapter2(endId){
 }
 function continueGame(){
   try{ s = fixState(JSON.parse(lsGet(SAVE_KEY))); }catch(e){ s=null; }
-  if(!s || !S[s.scene]){ startGame(); return; }
-  prev=null; lastScene=null; showGame(); render();
+  const go=()=>{ if(!s || !S[s.scene]){ startGame(); return; } prev=null; lastScene=null; showGame(); render(); };
+  if(s && s.chapter>=3) ensureChapter(s.chapter, go); else go();
 }
 function showGame(){ $('menu').style.display='none'; $('game').style.display='block'; }
 function showMenu(){
@@ -2354,6 +2405,7 @@ function showMenu(){
   const mm=meta(), open=chapter2Open();
   $('c2btn').classList.toggle('locked',!open);
   $('c2btn').textContent = open ? 'ГЛАВА II · ГЛУБИНА' : 'ГЛАВА II · ЗАКРЫТО';
+  const open3=chapter3Open(); $('c3btn').classList.toggle('locked',!open3); $('c3btn').textContent = open3 ? 'ГЛАВА III · ЭХО-6' : 'ГЛАВА III · ЗАКРЫТО';
   $('endsline').textContent = mm.ends.length ? 'Концовок: '+mm.ends.length+' из '+TOTAL_ENDS+' · достижений: '+mm.ach.length+' из '+ACH.length : 'Концовок: '+TOTAL_ENDS+'. Найди их все.';
 }
 $('newbtn').onclick = ()=>{ lsDel(SAVE_KEY); startGame(); };
@@ -2362,6 +2414,10 @@ $('menubtn').onclick = ()=>{ save(); showMenu(); };
 $('c2btn').onclick = ()=>{
   if(!chapter2Open()){ $('endsline').textContent='Сначала пройди главу I до любой концовки.'; SND.sfx('dmg'); return; }
   lsDel(SAVE_KEY); startChapter2(null);
+};
+$('c3btn').onclick = ()=>{
+  if(!chapter3Open()){ $('endsline').textContent='Сначала пройди главу II, не погибнув: закрой шахту, ответь Хору, уйди или забери осколок.'; SND.sfx('dmg'); return; }
+  lsDel(SAVE_KEY); startChapter3(null);
 };
 $('achbtn').onclick = ()=>showAchievements();
 $('statbtn').onclick = ()=>showStats();
@@ -2537,7 +2593,19 @@ function paintEndStat(id){
   const el=$('endstat'); if(!el || !s || s.scene!==id || !s._end) return;
   el.textContent=endStatText(id);
 }
+function buildCampaignFail(box, sc, base){
+  box.className='choices endbox kind-bad';
+  const info=document.createElement('div'); info.className='endinfo';
+  info.innerHTML='<div class="endtag">ГЛАВА НЕ ПРОЙДЕНА</div>'; box.appendChild(info);
+  const btns=[];
+  if(lsGet('echo7_chk_3')) btns.push(['С контрольной точки', ()=>retryFromCheckpoint(), true]);
+  btns.push(['Главу III с начала', ()=>startChapter3(s.f.c2end)]);
+  btns.push(['В главное меню', ()=>showMenu()]);
+  btns.forEach((x,i)=>{ const b=document.createElement('button'); b.className='choice'+(x[2]?' primary':''); b.textContent=x[0];
+    b.style.animationDelay=(base+0.4+i*0.08)+'s'; b.onclick=x[1]; box.appendChild(b); });
+}
 function buildEnding(box, sc, base){
+  if(s.chapter>=3){ lsDel(SAVE_KEY); buildCampaignFail(box, sc, base); return; }
   const id=s.scene;
   if(!s._end){
     const r=recordEnding(s,id);
@@ -2563,7 +2631,10 @@ function buildEnding(box, sc, base){
   }
   const btns=[];
   if(s.chapter===1) btns.push(['Продолжить: Глава II · Глубина', ()=>startChapter2(id), true]);
-  else btns.push(['Сыграть главу II ещё раз', ()=>startChapter2(null), true]);
+  else {
+    if(C2_CONT.includes(id)) btns.push(['Продолжить: Глава III · Эхо-6', ()=>startChapter3(id), true]);
+    btns.push(['Сыграть главу II ещё раз', ()=>startChapter2(null), !C2_CONT.includes(id)]);
+  }
   btns.push(['Начать главу I заново', ()=>startGame()]);
   btns.push(['Статистика концовок', ()=>showStats()]);
   btns.push(['В главное меню', ()=>showMenu()]);
