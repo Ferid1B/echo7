@@ -1787,9 +1787,9 @@ function renderDepth(s,vis,cur){
 /* ЭХО-7 — ядро (без DOM, чтобы тестировать в node) */
 function newState(chapter){
   return { hp:10, san:10, o2:100, inv:[], f:{}, noise:0, clock:null, scene:'start', msgs:[], moves:0,
-           chapter:chapter||1, visited:[], stat:{kills:0,loud:0,hurt:0} };
+           chapter:chapter||1, visited:[], stat:{kills:0,loud:0,hurt:0}, rested:[], hazed:[], quiet:0 };
 }
-function fixState(s){ s.chapter=s.chapter||1; s.visited=s.visited||[]; s.stat=Object.assign({kills:0,loud:0,hurt:0}, s.stat||{}); return s; }
+function fixState(s){ s.chapter=s.chapter||1; s.visited=s.visited||[]; s.rested=s.rested||[]; s.hazed=s.hazed||[]; s.quiet=s.quiet||0; s.stat=Object.assign({kills:0,loud:0,hurt:0}, s.stat||{}); return s; }
 function chOf(sc,s){ return typeof sc.ch==='function' ? sc.ch(s) : (sc.ch||[]); }
 function visible(sc,s){ return chOf(sc,s).filter(c=>!c.if || c.if(s)); }
 function markVisited(s){
@@ -1805,13 +1805,35 @@ function settle(s){
   if(s.clock!==null && s.clock<=0) return c2 ? 'c2_late' : 'end_too_late';
   return null;
 }
+/* Баланс: где теряется здоровье и откуда берётся передышка */
+const HAZARD = { ext:'Мороз бьёт сквозь скафандр.', antenna:'Штанга обжигает холодом, перчатка рвётся.', vent:'Острый край решётки режет руку.',
+  reactor:'Жар реакторного зала обжигает лицо.', c2_wreck:'Обломок задевает плечо.', c2_d3:'Лёд под ногой трескается, ты падаешь на колено.', c2_up1:'Трос хлещет по рукам.' };
+function balance(s,sc,id,san0){
+  if(sc.end) return;
+  if(sc.safe){
+    if(!s.rested.includes(id) && !/^(c2_pick|c2_intro|c2_lev|c2_brief)$/.test(id)){
+      s.rested.push(id);
+      if(s.san<10) calm(s,1);
+      if(s.hp<10 && s.hp>0){ heal(s,1); }
+    }
+    return;
+  }
+  if(HAZARD[id] && !s.hazed.includes(id)){ s.hazed.push(id); sys(s,HAZARD[id]); hurt(s,1); }
+  if(s.noise>=2){ s.noise-=1; sys(s,'Шум привлёк внимание: что-то задело тебя в темноте.'); hurt(s,1); }
+  if(s.o2<=25 && s.o2>0){ sys(s,'Воздуха не хватает, в висках стучит.'); hurt(s,1); }
+  /* затишье: пока рассудок не падает, он понемногу возвращается */
+  if(s.san<san0) s.quiet=0;
+  else if(s.san<10){ s.quiet=(s.quiet||0)+1; if(s.quiet>=5){ s.quiet=0; sys(s,'Нота стихает. Дышать легче.'); calm(s,1); } }
+}
 function moveTo(s,id){
   const sc=S[id];
   if(!sc) throw new Error('no scene '+id);
+  const san0=s.san;
   if(!sc.safe && !sc.end) s.o2 -= (sc.cost||3);
   if(s.clock!==null && !sc.end) s.clock -= 1;
   s.scene=id; s.moves++;
   if(sc.enter){ const r=sc.enter(s); if(r){ s.scene=r; } }
+  balance(s,S[s.scene],s.scene,san0);
   const d=settle(s); if(d) s.scene=d;
   markVisited(s);
 }
