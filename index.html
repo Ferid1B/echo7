@@ -1123,6 +1123,7 @@ function applyMemory(s,id){
   s.f.m_codes=!!(f.code_a&&f.code_b&&f.code_c); s.f.m_heard=!!f.heard_ever; s.f.m_irina=!!f.irina_alive;
   s.f.m_cutter=!!f.hint_cutter; s.f.m_ice=!!f.lore_ice; s.f.m_david=!!f.david_dead; s.f.m_irina_killed=!!f.irina_killed;
   s.f.m_killer=(st.kills||0)>=2; s.f.m_pacifist=(st.kills||0)===0;
+  s.f.m_dcalm=!!f.david_calm; s.f.m_islept=!!f.irina_slept; s.f.m_pair=!!f.pair_touched; s.f.m_antenna=!!f.antenna_msg; s.f.m_fourth=!!f.marta_fourth; s.f.m_dav_stay=!!f.dav_stayed;
   if(s.f.m_killer) s.noise=2;
 }
 const G = s => s.f.g;
@@ -1894,7 +1895,7 @@ const SND = (function(){
     c2_up1:{hum:0,wind:.6,crys:.5,pres:.7,rum:.9,sing:.6,creak:2},
     c2_up2:{hum:0,wind:.7,crys:.4,pres:.5,rum:1,sing:.4,creak:2.5}
   };
-  function prof(st){ return (st && st.chapter===2) ? (C2A[st.scene]||SHIP) : null; }
+  function prof(st){ return (st && st.chapter===2) ? (C2A[st.scene]||(globalThis.C2A_EXTRA&&C2A_EXTRA[st.scene])||SHIP) : null; }
 
   function build(){
     ac = new (window.AudioContext||window.webkitAudioContext)();
@@ -2695,6 +2696,11 @@ function showStats(){
 <script src="chapters/ch1y.js"></script>
 <script src="chapters/ch1z.js"></script>
 <script src="chapters/ch1w.js"></script>
+<script src="chapters/ch2x.js"></script>
+<script src="chapters/ch2y.js"></script>
+<script src="chapters/ch2z.js"></script>
+<script src="chapters/ch2w.js"></script>
+<script src="chapters/ch2u.js"></script>
 <script>
 if('serviceWorker' in navigator && location.protocol.startsWith('http')){ window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{})); }
 </script>
