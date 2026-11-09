@@ -12,10 +12,10 @@ STACK.add('mint'); STACK.add('plugs');
 ITEM_USE.mint = s=>{ calm(s,2); sys(s,'Ты разжёвываешь листок мяты. Во рту холодно и свежо.'); };
 ITEM_USE.plugs = s=>{ s.f.plugs=3; sys(s,'Беруши вставлены. Мир стал ватным.'); };
 
-function logc(s){ s.f.logs=(s.f.logs||0)+1; sys(s,'Записей экипажа: '+s.f.logs+' из 35'); }
+function logc(s){ s.f.logs=(s.f.logs||0)+1; sys(s,'Записей экипажа: '+s.f.logs+' из 40'); }
 function NOTES1(s){
   let t='';
-  if(s.f.logs) t+='<div class="note"><b>Записей экипажа:</b> '+s.f.logs+' из 35</div>';
+  if(s.f.logs) t+='<div class="note"><b>Записей экипажа:</b> '+s.f.logs+' из 40</div>';
   if(s.f.lore_six) t+='<div class="note">Станций прослушивания было семь. Шесть закрыты. «Эхо-7» последняя.</div>';
   if(s.f.lore_fund) t+='<div class="note">Образец L-9 подняли по приказу Фонда. Орлова была против.</div>';
   if(s.f.lore_la) t+='<div class="note">Нота Хора — «ля» первой октавы, 440 Гц.</div>';
