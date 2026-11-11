@@ -1,4 +1,4 @@
-const CACHE='echo7-v21';
+const CACHE='echo7-v22';
 const ASSETS=['./','index.html','manifest.webmanifest','icons/icon-192.png','icons/icon-512.png','icons/icon-maskable-512.png',
 'fonts/literata-cyrillic-400-normal.woff2','fonts/literata-cyrillic-600-normal.woff2','fonts/literata-cyrillic-400-italic.woff2',
 'fonts/literata-latin-400-normal.woff2','fonts/literata-latin-600-normal.woff2','fonts/literata-latin-400-italic.woff2',

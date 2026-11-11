@@ -330,6 +330,28 @@ body.noscroll{overflow:hidden}
 .achrow b{font-family:"Share Tech Mono",ui-monospace,monospace;font-weight:400;color:var(--text);letter-spacing:.05em}
 .achstar{color:var(--warn);text-shadow:0 0 10px var(--warn)}
 @media (max-width:520px){.statrow{grid-template-columns:1fr 1.4fr 42px;gap:8px}.achrow{grid-template-columns:20px 1fr}.achrow span:last-child{grid-column:2}.toast{min-width:0;max-width:calc(100vw - 28px)}}
+
+/* заставка и титры */
+#splash,#credits{position:fixed;inset:0;z-index:200;background:#06090b;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;overflow:hidden;transition:opacity .9s}
+#splash.out,#credits.out{opacity:0;pointer-events:none}
+#splash .sr{position:absolute;left:50%;top:50%;width:40px;height:40px;margin:-20px 0 0 -20px;border:1.5px solid var(--acc);border-radius:50%;opacity:0;animation:sring 3.2s ease-out infinite}
+#splash .sr:nth-child(2){animation-delay:.9s}#splash .sr:nth-child(3){animation-delay:1.8s}
+@keyframes sring{0%{transform:scale(.4);opacity:.7}100%{transform:scale(16);opacity:0}}
+#splash h1{position:relative;font-size:clamp(54px,17vw,120px);letter-spacing:.06em;margin:0;color:#e8f6f3;text-shadow:0 0 28px rgba(127,227,208,.55);opacity:0;animation:stitle 2.6s ease-out .5s forwards}
+@keyframes stitle{0%{opacity:0;letter-spacing:.7em;filter:blur(10px)}55%{opacity:1;filter:blur(0)}100%{opacity:1;letter-spacing:.14em;filter:blur(0)}}
+#splash .ss{position:relative;margin-top:18px;font-size:12px;letter-spacing:.32em;color:var(--muted);opacity:0;animation:sfade 1.4s ease-out 1.6s forwards}
+#splash .sk{position:absolute;bottom:28px;font-size:11px;letter-spacing:.2em;color:#4b5a61;opacity:0;animation:sfade 1s ease-out 2.2s forwards}
+@keyframes sfade{to{opacity:1}}
+#credits{justify-content:flex-start;background:#05080a}
+#credits .roll{position:absolute;left:0;right:0;top:100%;padding:0 24px;animation:croll var(--dur,60s) linear forwards}
+@keyframes croll{to{transform:translateY(calc(-100% - 100vh))}}
+#credits h2{font-size:clamp(40px,12vw,76px);letter-spacing:.12em;margin:0 0 8px;color:#e8f6f3;text-shadow:0 0 24px rgba(127,227,208,.5)}
+#credits .cs{font-size:12px;letter-spacing:.3em;color:var(--muted);margin-bottom:70px}
+#credits .cg{margin:0 0 56px}
+#credits .ct{font-size:12px;letter-spacing:.3em;color:var(--acc);margin-bottom:14px}
+#credits .cn{font-size:19px;line-height:1.7;color:var(--text)}
+#credits .cq{font-size:18px;line-height:1.8;color:#9fb0b6;font-style:italic;max-width:520px;margin:0 auto 56px}
+#credits .csk{position:fixed;bottom:0;left:0;right:0;padding:26px 0 20px;background:linear-gradient(transparent,#05080a 55%);z-index:2;font-size:11px;letter-spacing:.2em;color:#4b5a61;pointer-events:none}
 </style>
 </head>
 <body>
@@ -340,6 +362,7 @@ body.noscroll{overflow:hidden}
 <div id="wipe"></div>
 <div id="vig"></div>
 <div id="fx"></div>
+<div id="splash"><span class="sr"></span><span class="sr"></span><span class="sr"></span><h1>ЭХО-7</h1><div class="ss mono">ТЕКСТОВЫЙ КВЕСТ</div><div class="sk mono">нажми, чтобы пропустить</div></div>
 <div id="menu">
   <div class="sub">ТЕКСТОВЫЙ КВЕСТ · ХОРРОР · ВЫЖИВАНИЕ</div>
   <div class="hero"><div class="rings"><span></span><span></span><span></span></div><h1 data-t="ЭХО-7">ЭХО-7</h1></div>
@@ -2364,7 +2387,7 @@ function pick(i){
   const before=s.scene, hp0=s.hp, san0=s.san;
   choose(s,i);
   if(s.scene===before && s.scene!=='__menu' && s.hp>=hp0 && s.san>=san0) SND.sfx('look', s.chapter);
-  if(s.scene==='__menu'){ s.scene='c2_pick'; showMenu(); return; }
+  if(s.scene==='__menu'){ const ended=s.f&&s.f.ending8&&!s.f.credits_seen; if(ended) s.f.credits_seen=true; s.scene='c2_pick'; if(ended) showCredits(()=>showMenu()); else showMenu(); return; }
   { const mm=/^__ch(\d)$/.exec(s.scene); if(mm && +mm[1]>=6){ s.scene='c'+(mm[1]-1)+'_done'; startChapterN(+mm[1]); return; } }
   if(s.scene==='__ch5'){ s.scene='c4_done'; startChapter5(); return; }
   if(s.scene==='__ch4'){ s.scene='c3_done'; startChapter4(); return; }
@@ -2654,6 +2677,41 @@ $('sndbtn2').onclick = toggleSound;
 document.addEventListener('keydown',e=>{ if(['k','K','л','Л'].includes(e.key) && !e.ctrlKey && !e.metaKey && $('game').style.display==='block'){ mapOpen=!mapOpen; syncMap(); } });
 document.addEventListener('keydown',e=>{ if((e.key==='m'||e.key==='M'||e.key==='ь'||e.key==='Ь') && !e.ctrlKey && !e.metaKey) toggleSound(); });
 syncSnd();
+
+/* ——— Заставка при запуске ——— */
+(function(){
+  const sp=$('splash'); let done=false;
+  function close(){ if(done) return; done=true; sp.classList.add('out'); setTimeout(()=>sp.remove(),1000); }
+  sp.addEventListener('pointerdown',close); document.addEventListener('keydown',close,{once:true});
+  setTimeout(close, REDUCED?600:3900);
+})();
+
+/* ——— Титры после финала главы VIII ——— */
+const CREDITS_END={
+  silence:'Ты закрыла Шахту. Мир стал тише.',
+  merge:'Ты стала слушателем. Хор больше не один.',
+  note:'Ты сыграла ноты вместе. Песня началась.',
+  eighth:'Ты стала восьмой нотой.'
+};
+function showCredits(done){
+  const key=(s&&s.f&&s.f.ending8)||'';
+  const g=(t,n)=>'<div class="cg"><div class="ct mono">'+t+'</div><div class="cn">'+n+'</div></div>';
+  const el=document.createElement('div'); el.id='credits';
+  el.innerHTML='<div class="roll"><h2>ЭХО-7</h2><div class="cs mono">ТЕКСТОВЫЙ КВЕСТ</div>'+
+    (CREDITS_END[key]?'<div class="cq">'+CREDITS_END[key]+'</div>':'')+
+    g('АВТОР И ИДЕЯ','Ferid1B')+
+    g('В РОЛЯХ','Мара Ким<br>Рейн<br>Ясмин<br>Лис<br>Назар<br>Баренц<br>Вика<br>Ковалёв')+
+    g('СЕМЬ НОТ','ля · си · до · ре · ми · фа · соль')+
+    g('СТАНЦИИ','Эхо-7 · Эхо-6 · Эхо-5 · Эхо-4<br>Эхо-3 · Эхо-2 · Эхо-1 · Шахта')+
+    '<div class="cq">Спасибо, что дослушала до конца.<br>Если услышишь голос — не отвечай.</div>'+
+    '<div class="cg"><div class="cn">ЭХО-7</div></div></div><div class="csk mono">нажми, чтобы пропустить</div>';
+  const dur=REDUCED?8:55; el.querySelector('.roll').style.setProperty('--dur',dur+'s');
+  document.body.appendChild(el);
+  let end=false;
+  function fin(){ if(end) return; end=true; el.classList.add('out'); setTimeout(()=>{el.remove(); done&&done();},900); }
+  el.addEventListener('pointerdown',fin);
+  el.querySelector('.roll').addEventListener('animationend',fin);
+}
 
 showMenu();
 
