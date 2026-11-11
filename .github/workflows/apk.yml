@@ -1,0 +1,82 @@
+name: Сборка APK
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Зависимости Capacitor
+        run: npm install
+
+      - name: Копируем игру в www
+        run: |
+          mkdir -p www
+          cp index.html sw.js manifest.webmanifest www/
+          for d in chapters fonts icons quiet; do [ -d "$d" ] && cp -r "$d" www/; done
+
+      - name: Android-проект
+        run: |
+          npx cap add android
+          npx cap sync android
+
+      - name: Иконка, портрет, версия
+        run: |
+          cd android/app
+          sed -i "s/versionCode 1/versionCode ${{ github.run_number }}/; s/versionName \"1.0\"/versionName \"1.0.${{ github.run_number }}\"/" build.gradle
+          sed -i 's/android:name=".MainActivity"/android:name=".MainActivity" android:screenOrientation="portrait"/' src/main/AndroidManifest.xml
+          rm -rf src/main/res/mipmap-anydpi-v26
+          for pair in mdpi:48 hdpi:72 xhdpi:96 xxhdpi:144 xxxhdpi:192; do
+            d=${pair%%:*}; s=${pair##*:}
+            for n in ic_launcher ic_launcher_round ic_launcher_foreground; do
+              convert ../../icons/icon-512.png -resize ${s}x${s} src/main/res/mipmap-$d/$n.png
+            done
+          done
+
+      - name: Ключ подписи
+        env:
+          KS_B64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
+        run: |
+          mkdir -p ~/.android
+          if [ -n "$KS_B64" ]; then
+            echo "$KS_B64" | base64 -d > ~/.android/debug.keystore
+          else
+            keytool -genkey -v -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey \
+              -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Echo7,O=Echo7,C=RU"
+          fi
+
+      - name: Сборка
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug
+          cp app/build/outputs/apk/debug/app-debug.apk ../ECHO-7.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ECHO-7-apk
+          path: ECHO-7.apk
+
+      - name: Релиз с APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="apk-${{ github.run_number }}"
+          gh release create "$TAG" ECHO-7.apk --title "ЭХО-7 APK (сборка ${{ github.run_number }})" --notes "Установочный файл для Android."

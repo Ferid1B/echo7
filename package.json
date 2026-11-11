@@ -1,0 +1,11 @@
+{
+  "name": "echo7",
+  "version": "1.0.0",
+  "private": true,
+  "description": "ЭХО-7 — текстовый sci-fi хоррор-квест (оболочка Android)",
+  "dependencies": {
+    "@capacitor/android": "^6.1.2",
+    "@capacitor/cli": "^6.1.2",
+    "@capacitor/core": "^6.1.2"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "appId": "com.ferid1b.echo7",
+  "appName": "ЭХО-7",
+  "webDir": "www",
+  "backgroundColor": "#0a0e11",
+  "android": { "allowMixedContent": false }
+}
