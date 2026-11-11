@@ -39,6 +39,8 @@ jobs:
 
       - name: Иконка, портрет, версия
         run: |
+          sudo apt-get install -y imagemagick >/dev/null
+          IM=$(command -v magick || command -v convert)
           cd android/app
           sed -i "s/versionCode 1/versionCode ${{ github.run_number }}/; s/versionName \"1.0\"/versionName \"1.0.${{ github.run_number }}\"/" build.gradle
           sed -i 's/android:name=".MainActivity"/android:name=".MainActivity" android:screenOrientation="portrait"/' src/main/AndroidManifest.xml
@@ -46,7 +48,7 @@ jobs:
           for pair in mdpi:48 hdpi:72 xhdpi:96 xxhdpi:144 xxxhdpi:192; do
             d=${pair%%:*}; s=${pair##*:}
             for n in ic_launcher ic_launcher_round ic_launcher_foreground; do
-              convert ../../icons/icon-512.png -resize ${s}x${s} src/main/res/mipmap-$d/$n.png
+              $IM ../../icons/icon-512.png -resize ${s}x${s} src/main/res/mipmap-$d/$n.png
             done
           done
 
